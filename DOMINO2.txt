@@ -1,0 +1,104 @@
+#include <bits/stdc++.h>
+using namespace std;
+
+struct Edge {
+    int to;
+    int id;
+};
+
+vector<Edge> g[10];
+vector< pair<int,int> > edges;
+vector<int> route;
+int deg[10];
+
+void euler(int start) {
+    stack<int> st;
+    vector< pair<int,int> > ecopy = edges;
+    vector< Edge > gcopy[10];
+    for (int i = 0; i < 10; i++) gcopy[i] = g[i];
+
+    st.push(start);
+    while (!st.empty()) {
+        int u = st.top();
+        while (!gcopy[u].empty() && ecopy[gcopy[u].back().id].first == -1) {
+            gcopy[u].pop_back();
+        }
+        if (gcopy[u].empty()) {
+            route.push_back(u);
+            st.pop();
+        } else {
+            Edge e = gcopy[u].back();
+            gcopy[u].pop_back();
+            int v = e.to;
+            ecopy[e.id].first = ecopy[e.id].second = -1;
+            st.push(v);
+        }
+    }
+}
+
+int main() {
+    ios::sync_with_stdio(false);
+    cin.tie(NULL);
+
+    int n;
+    cin >> n;
+    edges.reserve(n);
+    for (int i = 0; i < 10; i++) {
+        deg[i] = 0;
+        g[i].clear();
+    }
+    for (int i = 0; i < n; i++) {
+        int a, b;
+        cin >> a >> b;
+        edges.push_back(make_pair(a, b));
+        Edge e1; e1.to = b; e1.id = i;
+        Edge e2; e2.to = a; e2.id = i;
+        g[a].push_back(e1);
+        g[b].push_back(e2);
+        deg[a]++; deg[b]++;
+    }
+    // check degree even
+    for (int i = 0; i < 10; i++) {
+        if (deg[i] % 2 != 0) {
+            cout << "NO\n";
+            return 0;
+        }
+    }
+    // find start vertex
+    int start = -1;
+    for (int i = 0; i < 10; i++) if (deg[i] > 0) { start = i; break; }
+    if (start == -1) {
+        cout << "NO\n";
+        return 0;
+    }
+    // check connectivity
+    vector<int> vis(10, 0);
+    stack<int> st;
+    st.push(start);
+    vis[start] = 1;
+    while (!st.empty()) {
+        int u = st.top(); st.pop();
+        for (size_t k = 0; k < g[u].size(); k++) {
+            int v = g[u][k].to;
+            if (!vis[v]) { vis[v] = 1; st.push(v); }
+        }
+    }
+    for (int i = 0; i < 10; i++) {
+        if (deg[i] > 0 && !vis[i]) {
+            cout << "NO\n";
+            return 0;
+        }
+    }
+    // Euler
+    route.clear();
+    euler(start);
+    if ((int)route.size() != n + 1) {
+        cout << "NO\n";
+        return 0;
+    }
+    cout << "YES\n";
+    for (int i = route.size() - 1; i > 0; i--) {
+        cout << route[i] << " " << route[i - 1] << "\n";
+    }
+    return 0;
+}

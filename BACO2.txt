@@ -1,0 +1,79 @@
+#include <iostream>
+#include <vector>
+using namespace std;
+
+int main() {
+    int t, x;
+    if (!(cin >> t >> x)) return 0;
+    // board indices 1..8 -> map to 0..7
+    bool occ[8][8];
+    bool ctrl[8][8];
+    for (int i = 0; i < 8; ++i)
+        for (int j = 0; j < 8; ++j) { occ[i][j] = false; ctrl[i][j] = false; }
+
+    vector< pair<int,int> > bishops, rooks;
+    for (int i = 0; i < t; ++i) {
+        int tx, ty; cin >> tx >> ty; // tx: column, ty: row
+        --tx; --ty;
+        bishops.push_back(make_pair(tx, ty));
+        occ[ty][tx] = true;
+    }
+    for (int i = 0; i < x; ++i) {
+        int rx, ry; cin >> rx >> ry;
+        --rx; --ry;
+        rooks.push_back(make_pair(rx, ry));
+        occ[ry][rx] = true;
+    }
+
+    // mark own squares controlled
+    for (size_t i = 0; i < bishops.size(); ++i) {
+        int cx = bishops[i].first, cy = bishops[i].second;
+        ctrl[cy][cx] = true;
+    }
+    for (size_t i = 0; i < rooks.size(); ++i) {
+        int cx = rooks[i].first, cy = rooks[i].second;
+        ctrl[cy][cx] = true;
+    }
+
+    // bishop directions: four diagonals
+    int bdx[4] = {1, 1, -1, -1};
+    int bdy[4] = {1, -1, 1, -1};
+    for (size_t i = 0; i < bishops.size(); ++i) {
+        int sx = bishops[i].first, sy = bishops[i].second;
+        for (int d = 0; d < 4; ++d) {
+            int xcur = sx + bdx[d];
+            int ycur = sy + bdy[d];
+            while (xcur >= 0 && xcur < 8 && ycur >= 0 && ycur < 8) {
+                ctrl[ycur][xcur] = true;
+                if (occ[ycur][xcur]) break; // blocked (include blocker)
+                xcur += bdx[d];
+                ycur += bdy[d];
+            }
+        }
+    }
+
+    // rook directions: four straight
+    int rdx[4] = {1, -1, 0, 0};
+    int rdy[4] = {0, 0, 1, -1};
+    for (size_t i = 0; i < rooks.size(); ++i) {
+        int sx = rooks[i].first, sy = rooks[i].second;
+        for (int d = 0; d < 4; ++d) {
+            int xcur = sx + rdx[d];
+            int ycur = sy + rdy[d];
+            while (xcur >= 0 && xcur < 8 && ycur >= 0 && ycur < 8) {
+                ctrl[ycur][xcur] = true;
+                if (occ[ycur][xcur]) break;
+                xcur += rdx[d];
+                ycur += rdy[d];
+            }
+        }
+    }
+
+    int cnt = 0;
+    for (int r = 0; r < 8; ++r)
+        for (int c = 0; c < 8; ++c)
+            if (ctrl[r][c]) ++cnt;
+
+    cout << cnt << "\n";
+    return 0;
+}

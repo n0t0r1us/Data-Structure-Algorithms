@@ -1,0 +1,27 @@
+#include <iostream>
+using namespace std;
+
+int main() {
+    int n;
+    cin >> n;
+    int a[25];
+    for (int i = 0; i < n; ++i) cin >> a[i];
+
+    for (int i = 1; i < n; ++i) {
+        int val = a[i];
+        int k = i;
+        // tìm vị trí chèn thích hợp
+        for (int j = 0; j < i; ++j) {
+            if (val < a[j]) {
+                k = j;
+                break;
+            }
+        }
+        // dịch chuyển phần tử để chèn
+        for (int j = i; j > k; --j)
+            a[j] = a[j - 1];
+        a[k] = val;
+        cout << val << " " << k << endl;
+    }
+    return 0;
+}

@@ -1,0 +1,24 @@
+#include <iostream>
+using namespace std;
+
+int main() {
+    int n; 
+    cin >> n;
+
+    // Mỗi ô là 3x3, tổng kích thước là 3n x 3n
+    // Ô đầu tiên (0,0) là trắng (W)
+    for (int i = 0; i < 3*n; i++) {
+        for (int j = 0; j < 3*n; j++) {
+            // Tính ô hiện tại
+            int row_block = i / 3;
+            int col_block = j / 3;
+            // Tổng chỉ số block để xác định màu: nếu tổng chẵn là trắng, lẻ là đen
+            if ((row_block + col_block) % 2 == 0)
+                cout << 'W';
+            else
+                cout << 'B';
+        }
+        cout << "\n";
+    }
+    return 0;
+}

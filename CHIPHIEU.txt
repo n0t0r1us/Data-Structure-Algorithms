@@ -1,0 +1,27 @@
+#include <iostream>
+#include <cmath>
+using namespace std;
+
+// Hàm kiểm tra xem số có chứa chữ số 4 không
+bool isValid(int x) {
+    while (x > 0) {
+        if (x % 10 == 4) return false;
+        x /= 10;
+    }
+    return true;
+}
+
+int main() {
+    int d;
+    cin >> d;
+
+    for (int a = d / 2; a >= 0; --a) {
+        int b = d - a;
+        if (isValid(a) && isValid(b)) {
+            cout << a << " " << b << endl;
+            break;
+        }
+    }
+
+    return 0;
+}

@@ -1,0 +1,129 @@
+#include <iostream>
+#include <vector>
+#include <cstdio>
+#include <cstdlib>
+using namespace std;
+
+typedef long long ll;
+const ll BASE = 1000000000LL; // 1e9
+
+struct BigInt {
+    // represent absolute value in base BASE, little-endian
+    vector<int> d;
+    int sign; // 1 or -1
+
+    BigInt() { sign = 1; d.clear(); }
+    BigInt(long long v) { setLL(v); }
+
+    void setLL(long long v) {
+        d.clear();
+        if (v == 0) { sign = 1; return; }
+        if (v < 0) { sign = -1; v = -v; } else sign = 1;
+        while (v > 0) {
+            d.push_back(int(v % BASE));
+            v /= BASE;
+        }
+    }
+
+    bool isZero() const { return d.empty(); }
+
+    void normalize() {
+        while (!d.empty() && d.back() == 0) d.pop_back();
+        if (d.empty()) sign = 1;
+    }
+
+    // multiply by small int m (|m| <= 50)
+    void mulInt(int m) {
+        if (m == 0) {
+            d.clear();
+            sign = 1;
+            return;
+        }
+        if (isZero()) {
+            // zero * m = 0
+            return;
+        }
+        if (m < 0) { sign = -sign; m = -m; }
+        long long carry = 0;
+        for (size_t i = 0; i < d.size(); ++i) {
+            long long cur = carry + 1LL * d[i] * m;
+            d[i] = int(cur % BASE);
+            carry = cur / BASE;
+        }
+        while (carry) {
+            d.push_back(int(carry % BASE));
+            carry /= BASE;
+        }
+        normalize();
+    }
+
+    // compare absolute values: return -1 if |this|<|other|, 0 if equal, 1 if >
+    int cmpAbs(const BigInt &other) const {
+        if (d.size() < other.d.size()) return -1;
+        if (d.size() > other.d.size()) return 1;
+        for (int i = (int)d.size() - 1; i >= 0; --i) {
+            if (d[i] < other.d[i]) return -1;
+            if (d[i] > other.d[i]) return 1;
+        }
+        return 0;
+    }
+
+    // compare with sign: return -1 if this<other, 0 if equal, 1 if this>other
+    int cmp(const BigInt &other) const {
+        if (isZero() && other.isZero()) return 0;
+        if (sign != other.sign) return (sign < other.sign) ? -1 : 1;
+        int ca = cmpAbs(other);
+        if (sign == 1) return ca;
+        else return -ca;
+    }
+
+    // set to 1
+    void setOne() { d.clear(); d.push_back(1); sign = 1; }
+
+    // print decimal
+    void print() const {
+        if (isZero()) { printf("0"); return; }
+        if (sign < 0) putchar('-');
+        int n = d.size();
+        printf("%d", d[n-1]);
+        for (int i = n-2; i >= 0; --i) {
+            printf("%09d", d[i]);
+        }
+    }
+};
+
+int main() {
+    ios::sync_with_stdio(false);
+    cin.tie(0);
+
+    int n;
+    if (!(cin >> n)) return 0;
+    vector<int> a(n);
+    for (int i = 0; i < n; ++i) cin >> a[i];
+
+    bool bestSet = false;
+    BigInt best;
+
+    for (int i = 0; i < n; ++i) {
+        BigInt prod;
+        prod.setOne(); // 1
+        for (int j = i; j < n; ++j) {
+            prod.mulInt(a[j]);
+            if (!bestSet) {
+                best = prod;
+                bestSet = true;
+            } else {
+                if (prod.cmp(best) > 0) best = prod;
+            }
+        }
+    }
+
+    if (!bestSet) {
+        // in case n==0 (shouldn't happen by statement), output 0
+        printf("0\n");
+    } else {
+        best.print();
+        printf("\n");
+    }
+    return 0;
+}

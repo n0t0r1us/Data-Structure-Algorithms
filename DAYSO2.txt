@@ -1,0 +1,39 @@
+#include <iostream>
+#include <cmath>
+#include <vector>
+
+using namespace std;
+
+#define FOR(i,a,b) for(int i=a; i<b; i++)
+#define REP(i,a,b) for(int i=a; i<=b; i++)
+#define LL long long
+
+
+int main()
+{
+	int n;
+	vector<LL> a,t3,T;
+	LL MAX = -999999999;
+	
+	cin>>n;
+	
+	a.resize(n+1);
+	t3.resize(n+1);
+	T.resize(n+1);
+	
+	REP(i,1,n)
+		cin>>a[i];
+
+	REP(i,3,n)
+		t3[i] = a[i] + a[i-1] + a[i-2];
+	
+	REP(i,3,n)
+	{
+		T[i] = max(t3[i],t3[i] + T[i-3]);
+		MAX = max(T[i],MAX);
+	}	
+	
+	cout<<MAX<<endl;
+	
+	return 0;
+}

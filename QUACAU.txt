@@ -1,0 +1,27 @@
+#include <iostream>
+#include <algorithm>
+
+using namespace std;
+
+int main() {
+    int n;
+    int a[105];
+    cin >> n;
+    for (int i = 0; i < n; i++) cin >> a[i];
+    sort(a, a + n); // sắp xếp tăng dần
+
+    int total = 0;
+    while (n > 3) {
+        int opt1 = a[1] + a[0] + a[n - 1] + a[1];
+        int opt2 = a[n - 1] + a[0] + a[n - 2] + a[0];
+        total += min(opt1, opt2);
+        n -= 2;
+    }
+
+    if (n == 3) total += a[0] + a[1] + a[2];
+    else if (n == 2) total += a[1];
+    else if (n == 1) total += a[0];
+
+    cout << total << endl;
+    return 0;
+}

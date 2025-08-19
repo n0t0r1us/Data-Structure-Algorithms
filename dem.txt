@@ -1,0 +1,28 @@
+#include <iostream>
+#include <string>
+#include <sstream>
+
+int countWords(const std::string& text) {
+    std::istringstream iss(text);
+    int wordCount = 0;
+    std::string word;
+
+    while (std::getline(iss, word, '.')) {
+        if (!word.empty()) {
+            wordCount++;
+        }
+    }
+
+    return wordCount;
+}
+
+int main() {
+    std::string text;
+    std::cout << " ";
+    std::getline(std::cin, text);
+
+    int wordCount = countWords(text);
+    std::cout << " " << wordCount << std::endl;
+
+    return 0;
+}

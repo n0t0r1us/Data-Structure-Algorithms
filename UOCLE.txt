@@ -1,0 +1,24 @@
+#include <bits/stdc++.h>
+using namespace std;
+
+long long countPerfectSquares(long long L, long long R) {
+    long long a = sqrtl(L);
+    while (a * a < L) a++;
+    long long b = sqrtl(R);
+    while (b * b > R) b--;
+    if (a > b) return 0;
+    return b - a + 1;
+}
+
+int main() {
+    ios::sync_with_stdio(false);
+    cin.tie(NULL);
+    int T;
+    cin >> T;
+    while (T--) {
+        long long L, R;
+        cin >> L >> R;
+        cout << countPerfectSquares(L, R) << "\n";
+    }
+    return 0;
+}

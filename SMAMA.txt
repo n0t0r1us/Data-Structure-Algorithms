@@ -1,0 +1,32 @@
+#include <iostream>
+#include <string>
+using namespace std;
+
+int main() {
+    unsigned long long K;
+    if (!(cin >> K)) return 0;
+
+    // Tìm L: smallest L such that sum_{i=1..L} 2^i >= K
+    // sum = 2^(L+1) - 2
+    int L = 1;
+    while (true) {
+        unsigned long long cum = (1ULL << (L+1)) - 2ULL;
+        if (cum >= K) break;
+        ++L;
+    }
+
+    // C_prev = sum_{i=1..L-1} 2^i = 2^L - 2
+    // idx0 (0-based within length L) = K - C_prev - 1 = K - 2^L + 1
+    unsigned long long idx0 = K - (1ULL << L) + 1ULL;
+
+    // build string of length L from most significant bit to least
+    string res;
+    res.reserve(L);
+    for (int i = L - 1; i >= 0; --i) {
+        if ( (idx0 >> i) & 1ULL ) res.push_back('7');
+        else res.push_back('4');
+    }
+
+    cout << res << "\n";
+    return 0;
+}

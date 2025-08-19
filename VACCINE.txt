@@ -1,0 +1,139 @@
+#include <bits/stdc++.h>
+using namespace std;
+typedef unsigned long long ull;
+
+// subtract y from x: res = x - y (x and y are arrays of words little-endian)
+// returns nothing; res must be sized appropriately
+void sub_words(const vector<ull> &x, const vector<ull> &y, vector<ull> &res) {
+    int W = x.size();
+    res.assign(W, 0);
+    unsigned long long borrow = 0;
+    for (int i = 0; i < W; ++i) {
+        unsigned long long xi = x[i];
+        unsigned long long yi = (i < (int)y.size() ? y[i] : 0ULL);
+        unsigned long long tmp = xi - yi - borrow;
+        // determine new borrow: if xi < yi + borrow then borrow=1 else 0
+        unsigned long long bi = 0;
+        if (xi < yi + borrow) bi = 1;
+        res[i] = tmp;
+        borrow = bi;
+    }
+}
+
+// shift-left D by 1 bit, result in y; also set lowest bit to 1 (y = (D<<1) | 1)
+void shift_left1_or1(const vector<ull> &D, vector<ull> &y) {
+    int W = D.size();
+    y.assign(W, 0);
+    ull carry = 0;
+    for (int i = 0; i < W; ++i) {
+        ull cur = D[i];
+        ull newcarry = (cur >> 63);
+        y[i] = (cur << 1) | carry;
+        carry = newcarry;
+    }
+    // OR lowest bit 1
+    y[0] |= 1ULL;
+}
+
+// bitwise OR: z = a | b
+void or_words(const vector<ull> &a, const vector<ull> &b, vector<ull> &z) {
+    int W = a.size();
+    z.assign(W, 0);
+    for (int i = 0; i < W; ++i) {
+        z[i] = a[i] | b[i];
+    }
+}
+
+// bitwise AND: z = a & b
+void and_words(const vector<ull> &a, const vector<ull> &b, vector<ull> &z) {
+    int W = a.size();
+    z.assign(W, 0);
+    for (int i = 0; i < W; ++i) z[i] = a[i] & b[i];
+}
+
+// bitwise NOT: z = ~a, but mask the last word to valid bits only
+void not_words(const vector<ull> &a, vector<ull> &z, ull last_mask) {
+    int W = a.size();
+    z.assign(W, 0);
+    for (int i = 0; i < W; ++i) z[i] = ~a[i];
+    // mask last word (highest index) with last_mask
+    z[W-1] &= last_mask;
+}
+
+int main() {
+    ios::sync_with_stdio(false);
+    cin.tie(0);
+
+    int T;
+    if (!(cin >> T)) return 0;
+    while (T--) {
+        int N;
+        string P;
+        cin >> N;
+        cin >> P;
+        int n = (int)P.size();
+        vector<string> vaccines;
+        vaccines.reserve(N);
+        for (int i = 0; i < N; ++i) {
+            string s; cin >> s;
+            vaccines.push_back(s);
+        }
+
+        // prepare word size
+        const int WORD = 64;
+        int W = (n + WORD - 1) / WORD;
+        // mask for last word: only low (n - (W-1)*64) bits valid
+        ull last_mask;
+        if (n % WORD == 0) last_mask = ~0ULL;
+        else last_mask = ((1ULL << (n % WORD)) - 1ULL);
+
+        // build S[c] bitsets: positions in P where char == c
+        // map by ASCII 0..255
+        vector< vector<ull> > S(256, vector<ull>(W, 0ULL));
+        for (int pos = 0; pos < n; ++pos) {
+            unsigned char c = (unsigned char)P[pos];
+            int idx = pos / WORD;
+            int off = pos % WORD;
+            S[c][idx] |= (1ULL << off);
+        }
+        // ensure last word masked (for safety)
+        for (int c = 0; c < 256; ++c) S[c][W-1] &= last_mask;
+
+        int best = 0;
+        // temporary vectors reused
+        vector<ull> D(W), x(W), y(W), tmp(W), nottmp(W), newD(W);
+
+        for (int vi = 0; vi < N; ++vi) {
+            const string &V = vaccines[vi];
+            // init D = 0
+            for (int i = 0; i < W; ++i) D[i] = 0ULL;
+
+            for (size_t t = 0; t < V.size(); ++t) {
+                unsigned char ch = (unsigned char)V[t];
+                // x = S[ch] | D
+                for (int i = 0; i < W; ++i) x[i] = S[ch][i] | D[i];
+                // y = (D << 1) | 1
+                shift_left1_or1(D, y);
+                // tmp = x - y
+                sub_words(x, y, tmp);
+                // nottmp = ~tmp (mask last)
+                not_words(tmp, nottmp, last_mask);
+                // newD = x & nottmp
+                and_words(x, nottmp, newD);
+                // assign D = newD
+                for (int i = 0; i < W; ++i) D[i] = newD[i];
+            }
+
+            // popcount(D)
+            int cnt = 0;
+            for (int i = 0; i < W; ++i) {
+                cnt += __builtin_popcountll(D[i]);
+            }
+            if (cnt > best) best = cnt;
+        }
+
+        cout << best << "\n";
+    }
+
+    return 0;
+}

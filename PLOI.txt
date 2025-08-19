@@ -1,0 +1,26 @@
+#include <bits/stdc++.h>
+using namespace std;
+
+int main() {
+    ios::sync_with_stdio(false);
+    cin.tie(NULL);
+    int n;
+    cin >> n;
+    vector<int> faults(12, 0);
+    vector<int> result;
+    for (int i = 0; i < n; i++) {
+        int a;
+        cin >> a;
+        faults[a]++;
+        if (faults[a] == 3) {
+            result.push_back(a);
+            faults[a] = 0; // reset sau khi thay ra
+        }
+    }
+    cout << (int)result.size() << "\n";
+    for (int i = 0; i < (int)result.size(); i++) {
+        cout << result[i];
+        if (i < (int)result.size() - 1) cout << " ";
+    }
+    return 0;
+}

@@ -1,0 +1,390 @@
+#include <bits/stdc++.h>
+using namespace std;
+typedef long long ll;
+const ll NEG = -(1LL<<60);
+
+int n, K;
+vector<vector<int> > adj; // i -> children
+vector<ll> val;
+
+// For per-start processing
+vector<int> state; // 0 unvisited,1 instack,2 done
+vector<int> stk;
+vector<int> inCycle; // -1 if not, else cycle id (we only need mark)
+vector<vector<int> > cycles_nodes; // list of nodes in the (single) cycle found
+vector<char> reachable; // nodes reachable from start
+int curCycleId;
+
+void dfs_mark_reach_cycle(int u) {
+    state[u] = 1;
+    stk.push_back(u);
+    reachable[u] = 1;
+    for (size_t i = 0; i < adj[u].size(); ++i) {
+        int v = adj[u][i];
+        if (!reachable[v]) {
+            dfs_mark_reach_cycle(v);
+        }
+        if (state[v] == 1) {
+            // found a cycle: collect nodes from v to end of stack
+            if (inCycle[v] == -1) {
+                vector<int> cyc;
+                for (int p = (int)stk.size()-1; p >= 0; --p) {
+                    int node = stk[p];
+                    cyc.push_back(node);
+                    inCycle[node] = curCycleId;
+                    if (node == v) break;
+                }
+                // cyc currently from end to start (v..u), reverse to start at v then forward
+                reverse(cyc.begin(), cyc.end());
+                cycles_nodes.push_back(cyc);
+                curCycleId++;
+            }
+        }
+    }
+    stk.pop_back();
+    state[u] = 2;
+}
+
+// compute dp for non-cycle nodes (tree DP), memoized
+vector< vector<ll> > memo_dp; // memo_dp[u] empty if not computed
+vector<int> compSz; // subtree size limited by reachable
+
+vector<ll> combine_knapsack(const vector<ll> &A, const vector<ll> &B, int limit) {
+    int sa = (int)A.size()-1;
+    int sb = (int)B.size()-1;
+    int smax = min(limit, sa + sb);
+    vector<ll> C(smax+1, NEG);
+    for (int i = 0; i <= min(limit, sa); ++i) if (A[i] > NEG/2) {
+        for (int j = 0; j <= min(limit - i, sb); ++j) if (B[j] > NEG/2) {
+            ll cand = A[i] + B[j];
+            if (cand > C[i+j]) C[i+j] = cand;
+        }
+    }
+    return C;
+}
+
+vector<ll> dp_node(int u, int limit);
+
+// compute f_v for cycle node v: vector indexed by t (1..max) where selecting t nodes from v's attached trees including v selected
+vector<ll> compute_f_cyclenode(int v, int limit) {
+    // children excluding those that are in the same cycle (we should exclude cycle children)
+    vector<int> childs;
+    for (size_t i = 0; i < adj[v].size(); ++i) {
+        int to = adj[v][i];
+        if (inCycle[to] == -1) childs.push_back(to);
+        else {
+            // if to is in cycle but is not the next in same cycle, it's still cycle edge; we exclude all cycle edges
+            // (cycle nodes will be handled separately)
+        }
+    }
+    // start with base: take v itself => uses 1 pick and value val[v]
+    vector<ll> res(2, NEG); // indices 0..1
+    res[0] = NEG; // cannot take 0 when v is required selected in this f definition
+    res[1] = val[v];
+    // but we will allow extend res to size up to limit
+    for (size_t i = 0; i < childs.size(); ++i) {
+        int c = childs[i];
+        vector<ll> dp_c = dp_node(c, limit); // dp_c[0] allowed
+        // we must combine res and dp_c with res requiring at least 1 already included
+        // currently res size sr, dp_c size sc
+        int sr = (int)res.size()-1;
+        int sc = (int)dp_c.size()-1;
+        int newmax = min(limit, sr + sc);
+        vector<ll> nxt(newmax+1, NEG);
+        for (int a = 1; a <= sr; ++a) if (res[a] > NEG/2) {
+            for (int b = 0; b <= sc && a+b <= limit; ++b) if (dp_c[b] > NEG/2) {
+                ll cand = res[a] + dp_c[b];
+                if (cand > nxt[a+b]) nxt[a+b] = cand;
+            }
+        }
+        // also consider if res had more sizes than sr? but handled
+        res.swap(nxt);
+    }
+    // ensure indices start from 1; we may want to produce vector with index 0 allowed as 0 meaning not selecting v,
+    // but for f definition we only return entries >=1; however for combining with cycle prefix we need f_v[u] for u>=1.
+    // If limit >=1 and res currently maybe shorter, expand
+    if ((int)res.size() < 2) res.resize(2, NEG);
+    return res; // index from 0..max where 0 is NEG and >=1 valid
+}
+
+vector<ll> dp_node(int u, int limit) {
+    if (!reachable[u]) {
+        vector<ll> zero(1, 0);
+        return zero;
+    }
+    if (!memo_dp[u].empty()) return memo_dp[u];
+    if (inCycle[u] != -1) {
+        // dp_node for cycle node when treated as normal tree child should allow option 0 (not take cycle at all)
+        // but when used as child of non-cycle node, we need child_dp[0]=0 and child_dp[t>=1]=prefix_best[t] computed separately.
+        // Here we return empty and let caller handle cycle children specially. To be safe return {0}.
+        vector<ll> res(1, 0);
+        memo_dp[u] = res;
+        return res;
+    }
+    // normal tree node
+    // start with taking u or not
+    // dp[u][0]=0 (not taking u)
+    // dp[u][t>=1] selecting u and distribute remaining among children
+    vector<int> childs = adj[u];
+    // compute dp for children - but if child is in cycle, that child must be processed as special; here we will treat cycle child as a choice with dp0=0 and dp[t>=1] will be filled later via cycle prefix when processing cycle. However dp_node should still include option of not taking child. For now, when child is in cycle, we get dp_child = vector {0} only (handled by memoization above).
+    vector<ll> base(1, 0); // base for combining children when not taking u? Actually we need only the case when taking u.
+    // when not taking u => dp[0]=0 only.
+    // when taking u:
+    vector<ll> take(1, val[u]); // index 1 stored at position 1? We'll represent take vector where index t gives sum for selecting exactly t nodes including u.
+    // However take currently has size 1 meaning index 0 (invalid). We need have index1 -> val[u].
+    take.assign(2, NEG);
+    take[1] = val[u];
+    // combine children
+    for (size_t i = 0; i < childs.size(); ++i) {
+        int c = childs[i];
+        vector<ll> dp_c = dp_node(c, limit); // for cycle child returns {0}
+        // dp_c[0] valid
+        int sr = (int)take.size()-1;
+        int sc = (int)dp_c.size()-1;
+        int newmax = min(limit, sr + sc);
+        vector<ll> nxt(newmax+1, NEG);
+        for (int a = 1; a <= sr; ++a) if (take[a] > NEG/2) {
+            for (int b = 0; b <= sc && a+b <= limit; ++b) if (dp_c[b] > NEG/2) {
+                ll cand = take[a] + dp_c[b];
+                if (cand > nxt[a+b]) nxt[a+b] = cand;
+            }
+        }
+        take.swap(nxt);
+    }
+    // Now build result: dp[0]=0 and dp[t>=1] from take if available
+    int maxSz = min(limit, (int)take.size()-1);
+    vector<ll> res(maxSz+1, NEG);
+    res[0] = 0;
+    for (int t = 1; t <= maxSz; ++t) {
+        if (t < (int)take.size()) res[t] = take[t];
+        else res[t] = NEG;
+    }
+    memo_dp[u] = res;
+    return res;
+}
+
+vector<ll> process_cycle_prefix(int entry_node, int limit) {
+    int cid = inCycle[entry_node];
+    if (cid == -1) {
+        vector<ll> z(1, 0);
+        return z;
+    }
+    // find cycle nodes vector by cycles_nodes[cid]
+    vector<int> cyc = cycles_nodes[cid];
+    // rotate cyc so that first is entry_node
+    int L = (int)cyc.size();
+    int pos = -1;
+    for (int i = 0; i < L; ++i) if (cyc[i] == entry_node) { pos = i; break; }
+    vector<int> seq;
+    for (int i = 0; i < L; ++i) seq.push_back(cyc[(pos + i) % L]);
+    // for each seq[i], compute f_v
+    vector< vector<ll> > f(L);
+    for (int i = 0; i < L; ++i) {
+        f[i] = compute_f_cyclenode(seq[i], limit); // f[i][t] valid for t>=1
+    }
+    // compute prefix arrays for m=1..L
+    // h initially for first node
+    vector<ll> best(limit+1, NEG);
+    best[0] = 0; // allow 0 picks
+    vector<ll> h(limit+1, NEG);
+    // we'll build h_m progressively where h stores sums for exactly t picks covering first m nodes and each picked node included at least 1
+    // initialize with first node
+    for (int t = 0; t <= limit; ++t) h[t] = NEG;
+    // first node only
+    int sc = (int)f[0].size()-1;
+    for (int u = 1; u <= sc && u <= limit; ++u) if (f[0][u] > NEG/2) h[u] = f[0][u];
+    // record into best
+    for (int t = 1; t <= limit; ++t) if (h[t] > best[t]) best[t] = h[t];
+    // extend for next nodes
+    for (int idx = 1; idx < L; ++idx) {
+        vector<ll> nh(limit+1, NEG);
+        int scur = (int)f[idx].size()-1;
+        for (int a = 1; a <= limit; ++a) if (h[a] > NEG/2) {
+            for (int b = 1; b <= scur && a+b <= limit; ++b) if (f[idx][b] > NEG/2) {
+                ll cand = h[a] + f[idx][b];
+                if (cand > nh[a+b]) nh[a+b] = cand;
+            }
+        }
+        h.swap(nh);
+        for (int t = 1; t <= limit; ++t) if (h[t] > best[t]) best[t] = h[t];
+    }
+    // ensure best[0]=0
+    best[0] = 0;
+    return best;
+}
+
+int main() {
+    ios::sync_with_stdio(false);
+    cin.tie(0);
+    if (!(cin >> n >> K)) return 0;
+    adj.assign(n, vector<int>());
+    val.assign(n, 0);
+    for (int i = 0; i < n; ++i) {
+        int mi;
+        cin >> val[i] >> mi;
+        for (int j = 0; j < mi; ++j) {
+            int x; cin >> x; --x;
+            adj[i].push_back(x);
+        }
+    }
+    ll answer = 0;
+    // try every start node s
+    for (int s = 0; s < n; ++s) {
+        // reset per-start structures
+        state.assign(n, 0);
+        stk.clear();
+        inCycle.assign(n, -1);
+        cycles_nodes.clear();
+        reachable.assign(n, 0);
+        curCycleId = 0;
+        // mark reachable and cycles via DFS from s
+        dfs_mark_reach_cycle(s);
+        // memo clear
+        memo_dp.assign(n, vector<ll>());
+        // For nodes in cycles, compute f arrays and process cycles; but process_cycle_prefix will compute and use dp_node for non-cycle children
+        // Now we need dp for start s: if s is in cycle, handle directly process_cycle_prefix(s)
+        vector<ll> dp_s;
+        if (inCycle[s] != -1) {
+            // compute cycle prefix best for entry s
+            vector<ll> pref = process_cycle_prefix(s, K);
+            // dp_s is pref directly (since starting at cycle entry means we can't choose not to open any? We can choose 0? But start uses universal key once; you must open at least one file if you choose - but zero picks gives 0. Problem asks maximum sum of installed software, may be zero).
+            // So dp_s[t]=pref[t]
+            dp_s = pref;
+        } else {
+            // s not in cycle: compute dp_node(s)
+            // but dp_node for nodes may leave cycle children as {0}; we need to handle cycle children specially:
+            // So before calling dp_node, we should compute for each cycle id the prefix arrays for the entry point that will be used when that cycle node is encountered.
+            // However dp_node will call compute_f etc when encountering a cycle child? Our dp_node currently returns {0} for cycle nodes.
+            // To incorporate cycle children we will modify: after memoization of normal nodes, when combining children, if child is cycle node, we need to get prefix array for that child's entry (which is that child itself).
+            // Easiest: implement a custom stackless dp for trees starting from s that processes nodes postorder manually and when encountering a cycle child calls process_cycle_prefix for that child.
+            // We'll do a recursive function here instead of dp_node to properly handle cycle children.
+            // Clear memo and implement local recursion:
+            memo_dp.assign(n, vector<ll>());
+            // define lambda-like via local struct and function pointer: using function is C++11, so implement as internal function via std::vector and recursion using function pointer is cumbersome. We'll implement a recursive helper as static inside main via passing references using function pointer through std::tr1 deprecated? For simplicity implement as iterative recursion using stack? But simpler: write a recursive function nested using C++ function pointer is not allowed. Instead define a separate static function? For brevity we will implement a small manual recursion with global variables - we already have global structures; create a function compute_dp_tree(u,limit) above accessible.
+        }
+        // To simplify, instead of complex branching, we will reimplement computation for s not in cycle by performing a custom DFS post-order that handles cycle children using process_cycle_prefix.
+        if (inCycle[s] == -1) {
+            // Build postorder list for reachable nodes excluding cycle nodes
+            vector<int> order;
+            vector<char> vis(n, 0);
+            // recursive stack
+            vector<int> stacku;
+            stacku.push_back(s);
+            while (!stacku.empty()) {
+                int u = stacku.back();
+                if (!vis[u]) {
+                    vis[u] = 1;
+                    for (size_t i = 0; i < adj[u].size(); ++i) {
+                        int v = adj[u][i];
+                        if (!reachable[v]) continue;
+                        if (inCycle[v] != -1) continue; // skip cycle nodes
+                        if (!vis[v]) stacku.push_back(v);
+                    }
+                } else {
+                    stacku.pop_back();
+                    order.push_back(u);
+                }
+            }
+            // Now process nodes in order to compute memo_dp for non-cycle nodes
+            for (size_t idx = 0; idx < order.size(); ++idx) {
+                int u = order[idx];
+                // compute children list excluding cycle nodes
+                vector<int> childs;
+                for (size_t i = 0; i < adj[u].size(); ++i) {
+                    int v = adj[u][i];
+                    if (!reachable[v]) continue;
+                    if (inCycle[v] != -1) continue;
+                    childs.push_back(v);
+                }
+                // compute take vector as earlier
+                vector<ll> take(2, NEG);
+                take[1] = val[u];
+                for (size_t i = 0; i < childs.size(); ++i) {
+                    int c = childs[i];
+                    vector<ll> dp_c = memo_dp[c];
+                    int sr = (int)take.size()-1;
+                    int sc = (int)dp_c.size()-1;
+                    int newmax = min(K, sr + sc);
+                    vector<ll> nxt(newmax+1, NEG);
+                    for (int a = 1; a <= sr; ++a) if (take[a] > NEG/2) {
+                        for (int b = 0; b <= sc && a+b <= K; ++b) if (dp_c[b] > NEG/2) {
+                            ll cand = take[a] + dp_c[b];
+                            if (cand > nxt[a+b]) nxt[a+b] = cand;
+                        }
+                    }
+                    take.swap(nxt);
+                }
+                int maxSz = min(K, (int)take.size()-1);
+                vector<ll> res(maxSz+1, NEG);
+                res[0] = 0;
+                for (int t = 1; t <= maxSz; ++t) {
+                    if (t < (int)take.size()) res[t] = take[t];
+                    else res[t] = NEG;
+                }
+                memo_dp[u] = res;
+            }
+            // Now handle cycle children when combining at ancestors: we didn't include cycle children as they were skipped.
+            // To compute dp for s, we now need to do a second pass combining cycle children effects along path from s downward.
+            // Easiest: perform a recursion from s that for each node, when encountering a child that is in cycle, use process_cycle_prefix(child,K) to get child_dp and combine.
+            // We'll implement a recursive function using explicit stack and postorder combining with cycle children included.
+            // For that, we process nodes in postorder again but now compute final dp incorporating cycle children:
+            vector<ll> final_dp(n, 0); // not used fully
+            // We'll store final memo in memo_dp2
+            vector< vector<ll> > memo2(n);
+            // process nodes in order (postorder) so children processed before parent
+            for (size_t idx = 0; idx < order.size(); ++idx) {
+                int u = order[idx];
+                // build list of child dp vectors including cycle children
+                vector< vector<ll> > childDps;
+                for (size_t i = 0; i < adj[u].size(); ++i) {
+                    int v = adj[u][i];
+                    if (!reachable[v]) continue;
+                    if (inCycle[v] == -1) {
+                        childDps.push_back(memo_dp[v]); // previously computed for non-cycle child
+                    } else {
+                        // compute prefix for that cycle entry v
+                        vector<ll> pref = process_cycle_prefix(v, K);
+                        childDps.push_back(pref); // pref[0]=0, pref[t>=1] valid
+                    }
+                }
+                // Now combine: when taking u, we start with take vector
+                vector<ll> take(2, NEG);
+                take[1] = val[u];
+                for (size_t ci = 0; ci < childDps.size(); ++ci) {
+                    vector<ll> &dp_c = childDps[ci];
+                    int sr = (int)take.size()-1;
+                    int sc = (int)dp_c.size()-1;
+                    int newmax = min(K, sr + sc);
+                    vector<ll> nxt(newmax+1, NEG);
+                    for (int a = 1; a <= sr; ++a) if (take[a] > NEG/2) {
+                        for (int b = 0; b <= sc && a+b <= K; ++b) if (dp_c[b] > NEG/2) {
+                            ll cand = take[a] + dp_c[b];
+                            if (cand > nxt[a+b]) nxt[a+b] = cand;
+                        }
+                    }
+                    take.swap(nxt);
+                }
+                int maxSz = min(K, (int)take.size()-1);
+                vector<ll> res(maxSz+1, NEG);
+                res[0] = 0;
+                for (int t = 1; t <= maxSz; ++t) {
+                    if (t < (int)take.size()) res[t] = take[t];
+                    else res[t] = NEG;
+                }
+                memo2[u] = res;
+            }
+            // final dp for s is memo2[s]
+            dp_s = memo2[s];
+        }
+        if (dp_s.empty()) {
+            // should not happen; set zero vector
+            dp_s.assign(1, 0);
+        }
+        // take max over t <= K
+        for (int t = 0; t <= min((int)dp_s.size()-1, K); ++t) {
+            if (dp_s[t] > answer) answer = dp_s[t];
+        }
+    }
+    cout << answer << "\n";
+    return 0;
+}

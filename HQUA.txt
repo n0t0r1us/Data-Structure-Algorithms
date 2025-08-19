@@ -1,0 +1,33 @@
+#include <iostream>
+using namespace std;
+
+int main() {
+    int m, n;
+    cin >> m >> n;
+
+    int mid_row = n / 2;
+    int mid_col = m / 2;
+
+    for (int i = 0; i < n; ++i) {
+        for (int j = 0; j < m; ++j) {
+            if (i == 0 || i == n - 1) {
+                cout << '*'; // Viền trên và dưới
+            } else if (i == mid_row) {
+                if (j == 0 || j == m - 1)
+                    cout << '*'; // Viền trái/phải
+                else
+                    cout << '='; // Ruy băng ngang
+            } else {
+                if (j == 0 || j == m - 1)
+                    cout << '*'; // Viền trái/phải
+                else if (j == mid_col)
+                    cout << '|'; // Ruy băng dọc
+                else
+                    cout << ' '; // Khoảng trắng bên trong
+            }
+        }
+        cout << endl;
+    }
+
+    return 0;
+}

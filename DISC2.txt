@@ -1,0 +1,37 @@
+#include <iostream>
+#include <list>
+#include <map>
+using namespace std;
+
+int main() {
+    int n, m;
+    cin >> n >> m;
+
+    list<int> stack;
+    map<int, list<int>::iterator> position;
+
+    // Khởi tạo danh sách và vị trí đĩa
+    for (int i = 1; i <= n; ++i) {
+        stack.push_back(i);
+        list<int>::iterator it = stack.end();
+        --it;
+        position[i] = it;
+    }
+
+    for (int i = 0; i < m; ++i) {
+        int x;
+        cin >> x;
+
+        // Xóa x khỏi vị trí cũ
+        stack.erase(position[x]);
+
+        // Đưa x lên đầu
+        stack.push_front(x);
+        position[x] = stack.begin();
+
+        // In đĩa dưới cùng (cuối danh sách)
+        cout << stack.back() << " ";
+    }
+
+    return 0;
+}

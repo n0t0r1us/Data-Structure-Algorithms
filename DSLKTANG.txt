@@ -1,0 +1,58 @@
+#include <iostream>
+using namespace std;
+
+// Định nghĩa struct Node
+struct Node {
+    int data;
+    Node* next;
+};
+
+// Chèn node vào cuối danh sách
+void insertTail(Node*& head, int value) {
+    Node* newNode = new Node;
+    newNode->data = value;
+    newNode->next = NULL;
+
+    if (head == NULL) {
+        head = newNode;
+    } else {
+        Node* current = head;
+        while (current->next != NULL) {
+            current = current->next;
+        }
+        current->next = newNode;
+    }
+}
+
+// Kiểm tra xem danh sách có tăng dần không
+bool isIncreasing(Node* head) {
+    Node* current = head;
+    while (current != NULL && current->next != NULL) {
+        if (current->data > current->next->data) {
+            return false;
+        }
+        current = current->next;
+    }
+    return true;
+}
+
+int main() {
+    int n;
+    cin >> n;
+
+    Node* head = NULL;
+
+    for (int i = 0; i < n; ++i) {
+        int value;
+        cin >> value;
+        insertTail(head, value);
+    }
+
+    if (isIncreasing(head)) {
+        cout << "YES";
+    } else {
+        cout << "NO";
+    }
+
+    return 0;
+}

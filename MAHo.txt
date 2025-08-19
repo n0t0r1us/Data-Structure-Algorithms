@@ -1,0 +1,21 @@
+#include <iostream>
+#include <string>
+#include <algorithm>
+using namespace std;
+
+int main() {
+    string Q;
+    int k;
+    cin >> Q;
+    cin >> k;
+
+    string Sb = Q.substr(0, k);
+    string Se = Q.substr(k);
+
+    reverse(Sb.begin(), Sb.end());
+    reverse(Se.begin(), Se.end());
+
+    cout << Sb + Se << endl;
+
+    return 0;
+}

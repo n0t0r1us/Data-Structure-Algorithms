@@ -1,0 +1,44 @@
+#include <iostream>
+using namespace std;
+
+struct Node {
+    int data;
+    Node* next;
+};
+
+Node* MakeNode(int x) {
+    Node* p = new Node;
+    p->data = x;
+    p->next = NULL;
+    return p;
+}
+
+// Thêm node vào cuối danh sách
+void AddLast(Node*& head, int x) {
+    Node* p = MakeNode(x);
+    if (head == NULL) {
+        head = p;
+        return;
+    }
+    Node* tmp = head;
+    while (tmp->next != NULL) tmp = tmp->next;
+    tmp->next = p;
+}
+
+// In ngược danh sách (đệ quy)
+void PrintReverse(Node* head) {
+    if (head == NULL) return;
+    PrintReverse(head->next);
+    cout << head->data << " ";
+}
+
+int main() {
+    Node* head = NULL;
+    AddLast(head, 1);
+    AddLast(head, 5);
+    AddLast(head, 7);
+    AddLast(head, 4);
+
+    PrintReverse(head);
+    return 0;
+}

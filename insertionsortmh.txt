@@ -1,0 +1,51 @@
+#include <iostream>
+#include <windows.h>
+using namespace std;
+
+// Di chuyển con trỏ đến vị trí x, y trong console
+void gotoxy(int x, int y) {
+    COORD pos = { (SHORT)x, (SHORT)y };
+    SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), pos);
+}
+
+// Tạm dừng vài mili giây để tạo hiệu ứng
+void delay(int milliseconds) {
+    Sleep(milliseconds);
+}
+
+// In mảng tại dòng y
+void printArray(int a[], int n, int y) {
+    gotoxy(0, y);
+    for (int i = 0; i < n; ++i) {
+        cout << a[i] << " ";
+    }
+    cout << "       "; // xóa phần dư nếu có
+}
+
+void insertionSortVisual(int a[], int n) {
+    int y = 2;
+    printArray(a, n, y);
+    delay(500);
+    for (int i = 1; i < n; ++i) {
+        int x = a[i];
+        int pos = i;
+        while (pos > 0 && a[pos - 1] > x) {
+            a[pos] = a[pos - 1];
+            pos--;
+        }
+        a[pos] = x;
+        y++;
+        printArray(a, n, y);
+        delay(500);
+    }
+}
+
+int main() {
+    int a[] = { 34, 12, 25, 10, 30 };
+    int n = sizeof(a) / sizeof(a[0]);
+
+    insertionSortVisual(a, n);
+
+    gotoxy(0, 15);
+    return 0;
+}

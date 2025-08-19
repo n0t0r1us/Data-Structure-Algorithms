@@ -1,0 +1,85 @@
+#include <iostream>
+#include <cmath>  // abs
+using namespace std;
+
+struct Node {
+    int coef, exp;
+    Node* next;
+};
+
+void insertTail(Node*& head, int coef, int exp) {
+    Node* newNode = new Node;
+    newNode->coef = coef;
+    newNode->exp = exp;
+    newNode->next = NULL;
+
+    if (head == NULL) {
+        head = newNode;
+    } else {
+        Node* curr = head;
+        while (curr->next != NULL)
+            curr = curr->next;
+        curr->next = newNode;
+    }
+}
+
+void printPolynomial(Node* head) {
+    Node* curr = head;
+    bool firstTerm = true;
+
+    while (curr != NULL) {
+        int a = curr->coef;
+        int b = curr->exp;
+
+        if (a == 0) {
+            curr = curr->next;
+            continue;
+        }
+
+        if (firstTerm) {
+            // Term đầu tiên
+            if (a < 0) cout << "-";
+        } else {
+            if (a > 0) cout << "+";
+            else cout << "-";
+        }
+
+        int abs_a = abs(a);
+
+        // In hệ số + biến + mũ
+        if (b == 0) {
+            // Hằng số
+            cout << abs_a;
+        } else if (b == 1) {
+            // Bậc 1
+            if (abs_a != 1)
+                cout << abs_a << "x";
+            else
+                cout << "x";
+        } else {
+            // Bậc >= 2
+            if (abs_a != 1)
+                cout << abs_a << "x^" << b;
+            else
+                cout << "x^" << b;
+        }
+
+        firstTerm = false;
+        curr = curr->next;
+    }
+
+    if (firstTerm) cout << "0";  // Nếu không có hạng tử nào khác 0
+}
+
+int main() {
+    Node* head = NULL;
+    while (true) {
+        int a, b;
+        cin >> a >> b;
+        if (a == 0) break;
+        insertTail(head, a, b);
+    }
+
+    printPolynomial(head);
+    return 0;
+}

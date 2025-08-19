@@ -1,0 +1,82 @@
+#include <iostream>
+#include <vector>
+#include <string>
+using namespace std;
+typedef long long ll;
+
+int main() {
+    ios::sync_with_stdio(false);
+    cin.tie(0);
+    int n;
+    if (!(cin >> n)) return 0;
+    string s;
+    cin >> s;
+    vector<int> d1(n), d2(n);
+    // manacher odd
+    int l = 0, r = -1;
+    for (int i = 0; i < n; ++i) {
+        int k = (i > r) ? 1 : min(d1[l + r - i], r - i + 1);
+        while (i - k >= 0 && i + k < n && s[i - k] == s[i + k]) ++k;
+        d1[i] = k;
+        if (i + k - 1 > r) { l = i - k + 1; r = i + k - 1; }
+    }
+    // manacher even
+    l = 0; r = -1;
+    for (int i = 0; i < n; ++i) {
+        int k = (i > r) ? 0 : min(d2[l + r - i + 1], r - i + 1);
+        while (i - k - 1 >= 0 && i + k < n && s[i - k - 1] == s[i + k]) ++k;
+        d2[i] = k;
+        if (i + k - 1 > r) { l = i - k; r = i + k - 1; }
+    }
+
+    vector<ll> diffL(n+2, 0), diffR(n+2, 0);
+    // contributions to L_end
+    for (int i = 0; i < n; ++i) {
+        int start = i;
+        int end = i + d1[i] - 1;
+        if (start <= end) {
+            diffL[start] += 1;
+            diffL[end + 1] -= 1;
+        }
+        start = i;
+        end = i + d2[i] - 1;
+        if (start <= end) {
+            diffL[start] += 1;
+            diffL[end + 1] -= 1;
+        }
+    }
+    // contributions to R_start
+    for (int i = 0; i < n; ++i) {
+        int start = i - d1[i] + 1;
+        if (start < 0) start = 0;
+        int end = i;
+        if (start <= end) {
+            diffR[start] += 1;
+            diffR[end + 1] -= 1;
+        }
+        start = i - d2[i];
+        if (start < 0) start = 0;
+        end = i - 1;
+        if (start <= end) {
+            diffR[start] += 1;
+            diffR[end + 1] -= 1;
+        }
+    }
+
+    vector<ll> L(n,0), R(n,0);
+    ll cur = 0;
+    for (int i = 0; i < n; ++i) {
+        cur += diffL[i];
+        L[i] = cur;
+    }
+    cur = 0;
+    for (int i = 0; i < n; ++i) {
+        cur += diffR[i];
+        R[i] = cur;
+    }
+
+    ll ans = 0;
+    for (int i = 0; i < n; ++i) ans += L[i] * R[i];
+    cout << ans << "\n";
+    return 0;
+}

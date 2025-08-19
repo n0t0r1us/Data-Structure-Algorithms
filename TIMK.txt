@@ -1,0 +1,38 @@
+#include <bits/stdc++.h>
+using namespace std;
+typedef long long ll;
+
+ll countFactor(ll n, ll p) {
+    ll cnt = 0;
+    while (n) {
+        n /= p;
+        cnt += n;
+    }
+    return cnt;
+}
+
+int main() {
+    ios::sync_with_stdio(false);
+    cin.tie(NULL);
+    ll N, M;
+    cin >> N >> M;
+    ll K = LLONG_MAX;
+    ll m = M;
+    for (ll i = 2; i * i <= m; i++) {
+        if (m % i == 0) {
+            int exp = 0;
+            while (m % i == 0) {
+                m /= i;
+                exp++;
+            }
+            ll cnt = countFactor(N, i);
+            K = min(K, cnt / exp);
+        }
+    }
+    if (m > 1) {
+        ll cnt = countFactor(N, m);
+        K = min(K, cnt / 1);
+    }
+    cout << K << "\n";
+    return 0;
+}

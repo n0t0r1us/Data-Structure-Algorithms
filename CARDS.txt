@@ -1,0 +1,61 @@
+#include <iostream>
+#include <map>
+#include <vector>
+#include <algorithm>
+#include <string>
+using namespace std;
+
+int main() {
+    int N;
+    cin >> N;
+
+    map<int, int> cards; // map chỉ số -> số lượng
+    vector<pair<int, int> > outputs; // lưu kết quả các lượt 'P'
+
+    for (int i = 0; i < N; ++i) {
+        string cmd;
+        cin >> cmd;
+        if (cmd == "A") {
+            int w;
+            cin >> w;
+            cards[w]++;
+        } else if (cmd == "P") {
+            if (cards.empty()) {
+                outputs.push_back(make_pair(-1, -1));
+            } else {
+                map<int, int>::reverse_iterator it = cards.rbegin();
+                int maxVal = it->first;
+                int count = it->second;
+                outputs.push_back(make_pair(maxVal, count));
+                cards.erase(maxVal); // loại bỏ tất cả các lá bài có chỉ số lớn nhất
+            }
+        }
+    }
+
+    // In kết quả các lượt "P"
+    for (int i = 0; i < outputs.size(); ++i) {
+        if (outputs[i].first == -1)
+            cout << -1 << endl;
+        else
+            cout << outputs[i].first << " " << outputs[i].second << endl;
+    }
+
+    // In các lá bài còn lại (theo thứ tự giảm dần)
+    if (cards.empty()) {
+        cout << -1 << endl;
+    } else {
+        vector<int> result;
+        map<int, int>::reverse_iterator it;
+        for (it = cards.rbegin(); it != cards.rend(); ++it) {
+            for (int i = 0; i < it->second; ++i)
+                result.push_back(it->first);
+        }
+        for (int i = 0; i < result.size(); ++i) {
+            if (i > 0) cout << " ";
+            cout << result[i];
+        }
+        cout << endl;
+    }
+
+    return 0;
+}

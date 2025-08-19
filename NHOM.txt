@@ -1,0 +1,59 @@
+#include <iostream>
+#include <vector>
+#include <algorithm>
+#include <cstring>
+using namespace std;
+
+const int MAXN = 105;
+
+int parent[MAXN];
+
+// Tìm gốc của phần tử u (hàm find)
+int findRoot(int u) {
+    if (parent[u] != u)
+        parent[u] = findRoot(parent[u]);
+    return parent[u];
+}
+
+// Hợp nhất hai nhóm chứa u và v
+void unionSet(int u, int v) {
+    int pu = findRoot(u);
+    int pv = findRoot(v);
+    if (pu != pv)
+        parent[pu] = pv;
+}
+
+int main() {
+    int T;
+    cin >> T;
+
+    for (int test = 1; test <= T; ++test) {
+        int N, K;
+        cin >> N >> K;
+        vector<int> a(N);
+        for (int i = 0; i < N; ++i) {
+            cin >> a[i];
+            parent[i] = i;
+        }
+
+        // So sánh từng cặp để hợp nhóm nếu chênh lệch <= K
+        for (int i = 0; i < N; ++i) {
+            for (int j = i + 1; j < N; ++j) {
+                if (abs(a[i] - a[j]) <= K) {
+                    unionSet(i, j);
+                }
+            }
+        }
+
+        // Đếm số nhóm khác nhau (gốc khác nhau)
+        int groupCount = 0;
+        for (int i = 0; i < N; ++i) {
+            if (findRoot(i) == i)
+                groupCount++;
+        }
+
+        cout << "Case #" << test << ": " << groupCount << endl;
+    }
+
+    return 0;
+}

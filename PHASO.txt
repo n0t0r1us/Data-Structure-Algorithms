@@ -1,0 +1,111 @@
+#include <iostream>
+#include <string>
+#include <cstdlib>
+using namespace std;
+
+unsigned long long pow10_int(int k) {
+    unsigned long long r = 1;
+    for (int i = 0; i < k; ++i) r *= 10ULL;
+    return r;
+}
+
+unsigned long long gcd_ull(unsigned long long a, unsigned long long b) {
+    while (b) {
+        unsigned long long t = a % b;
+        a = b;
+        b = t;
+    }
+    return a;
+}
+
+int main() {
+    string s;
+    if (!(cin >> s)) return 0;
+
+    // parse
+    string part_int = "";    // phần nguyên (có thể rỗng => 0)
+    string part_nonrep = ""; // phần thập phân không lặp (A)
+    string part_rep = "";    // phần lặp (B)
+
+    size_t pos_dot = s.find('.');
+    size_t pos_lpar = s.find('(');
+    size_t pos_rpar = s.find(')');
+
+    if (pos_dot == string::npos) {
+        // không có dấu chấm -> toàn phần nguyên, có thể có ngoặc? (như "3" hoặc "2")
+        part_int = s;
+    } else {
+        // có chấm
+        part_int = s.substr(0, pos_dot);
+        if (pos_lpar == string::npos) {
+            // không có ngoặc => phần thập phân tới cuối
+            part_nonrep = s.substr(pos_dot + 1);
+        } else {
+            // có ngoặc
+            if (pos_lpar > pos_dot + 1) {
+                part_nonrep = s.substr(pos_dot + 1, pos_lpar - (pos_dot + 1));
+            } else {
+                part_nonrep = "";
+            }
+            if (pos_rpar != string::npos && pos_rpar > pos_lpar) {
+                part_rep = s.substr(pos_lpar + 1, pos_rpar - pos_lpar - 1);
+            } else {
+                part_rep = "";
+            }
+        }
+    }
+
+    // handle empty integer part like ".2"
+    if (part_int.size() == 0) part_int = "0";
+
+    // convert strings A and B to unsigned long long (0 if empty)
+    unsigned long long int_part = 0ULL;
+    for (size_t i = 0; i < part_int.size(); ++i) {
+        char c = part_int[i];
+        if (c >= '0' && c <= '9') {
+            int_part = int_part * 10ULL + (unsigned long long)(c - '0');
+        }
+    }
+
+    int a = (int)part_nonrep.size();
+    int b = (int)part_rep.size();
+
+    unsigned long long A = 0ULL;
+    for (int i = 0; i < a; ++i) {
+        char c = part_nonrep[i];
+        A = A * 10ULL + (unsigned long long)(c - '0');
+    }
+    unsigned long long AB = 0ULL;
+    for (int i = 0; i < a; ++i) {
+        char c = part_nonrep[i];
+        AB = AB * 10ULL + (unsigned long long)(c - '0');
+    }
+    for (int i = 0; i < b; ++i) {
+        char c = part_rep[i];
+        AB = AB * 10ULL + (unsigned long long)(c - '0');
+    }
+
+    unsigned long long numer = 0ULL, denom = 1ULL;
+
+    if (b == 0) {
+        // số hữu hạn
+        denom = pow10_int(a);
+        numer = int_part * denom + A;
+    } else {
+        unsigned long long pow_a = pow10_int(a);
+        unsigned long long pow_ab = pow10_int(a + b);
+        unsigned long long num_frac = AB - A; // concat(A,B) - A
+        unsigned long long den_frac = pow_ab - pow_a;
+        numer = int_part * den_frac + num_frac;
+        denom = den_frac;
+    }
+
+    // rút gọn
+    unsigned long long g = gcd_ull(numer, denom);
+    numer /= g;
+    denom /= g;
+
+    // print
+    cout << numer << "/" << denom << "\n";
+    return 0;
+}

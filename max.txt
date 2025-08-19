@@ -1,0 +1,31 @@
+#include <iostream>
+#include <sstream>
+#include <vector>
+
+std::string findLongestWord(const std::string& input) {
+    std::istringstream iss(input);
+    std::string word;
+    std::string longestWord;
+    size_t maxLength = 0;
+
+    while (iss >> word) {
+        if (word.length() > maxLength) {
+            maxLength = word.length();
+            longestWord = word;
+        }
+    }
+
+    return longestWord;
+}
+
+int main() {
+    std::string input;
+    std::cout << " ";
+    std::getline(std::cin, input);
+
+    std::string longestWord = findLongestWord(input);
+
+    std::cout << " " << longestWord << std::endl;
+
+    return 0;
+}

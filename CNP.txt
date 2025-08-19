@@ -1,0 +1,33 @@
+#include <iostream>
+#include <string>
+using namespace std;
+
+string buildTree(string inorder, string preorder) {
+    if (inorder.empty()) 
+        return "";
+    
+    char root = preorder[0];
+    int pos = inorder.find(root);
+    
+    string left_in = inorder.substr(0, pos);
+    string right_in = inorder.substr(pos + 1);
+    
+    string left_pre = preorder.substr(1, left_in.length());
+    string right_pre = preorder.substr(1 + left_in.length());
+    
+    string left_post = buildTree(left_in, left_pre);
+    string right_post = buildTree(right_in, right_pre);
+    
+    return left_post + right_post + root;
+}
+
+int main() {
+    string inorder, preorder;
+    getline(cin, inorder);
+    getline(cin, preorder);
+    
+    string postorder = buildTree(inorder, preorder);
+    cout << postorder << endl;
+    
+    return 0;
+}

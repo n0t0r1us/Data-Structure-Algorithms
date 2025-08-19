@@ -1,0 +1,32 @@
+#include <bits/stdc++.h>
+using namespace std;
+int main() {
+    ios::sync_with_stdio(false);
+    cin.tie(0);
+    const long long MOD = 1000000000LL;
+    int N;
+    if (!(cin >> N)) return 0;
+    vector<int> A(N+2,0); // positions 0..N+1, banks are 0 (good)
+    for (int i = 1; i <= N; ++i) cin >> A[i];
+    // A[i]: 0 good, 1 wobbly, 2 broken
+    vector<long long> dp(N+2, 0); // dp[i] ways to stand on position i
+    dp[0] = 1; // left bank
+    for (int i = 0; i <= N; ++i) {
+        if (dp[i] == 0) continue;
+        int srcType = A[i]; // i==0 is bank treated as 0
+        for (int step = 1; step <= 3; ++step) {
+            int j = i + step;
+            if (j > N+1) break;
+            // check source constraints: if source is wobbly (1), can only go step 1 or 2
+            if (srcType == 1 && step > 2) continue;
+            int targType = (j==N+1 ? 0 : A[j]);
+            // cannot land on broken
+            if (targType == 2) continue;
+            // if target is wobbly, it only accepts incoming from j-1
+            if (targType == 1 && i != j-1) continue;
+            dp[j] = (dp[j] + dp[i]) % MOD;
+        }
+    }
+    cout << (dp[N+1] % MOD) << "\n";
+    return 0;
+}

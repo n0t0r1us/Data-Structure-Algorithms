@@ -1,0 +1,83 @@
+#include <iostream>
+#include <queue>
+#include <map>
+#include <vector>
+using namespace std;
+
+struct Node {
+    char ch;
+    int freq;
+    Node *left, *right;
+    Node(char c, int f) {
+        ch = c;
+        freq = f;
+        left = right = NULL;
+    }
+    Node(Node* l, Node* r) {
+        ch = 0; // not used
+        freq = l->freq + r->freq;
+        left = l;
+        right = r;
+    }
+};
+
+// So sánh để tạo min-heap
+struct Compare {
+    bool operator()(Node* a, Node* b) {
+        return a->freq > b->freq;
+    }
+};
+
+void getCodeLengths(Node* root, int depth, map<char, int>& codeLength) {
+    if (!root) return;
+    if (!root->left && !root->right) {
+        codeLength[root->ch] = depth;
+        return;
+    }
+    getCodeLengths(root->left, depth + 1, codeLength);
+    getCodeLengths(root->right, depth + 1, codeLength);
+}
+
+int main() {
+    int n;
+    string s;
+    cin >> n;
+    cin.ignore();
+    getline(cin, s);
+
+    map<char, int> freq;
+    for (int i = 0; i < n; ++i) {
+        freq[s[i]]++;
+    }
+
+    priority_queue<Node*, vector<Node*>, Compare> pq;
+    for (map<char, int>::iterator it = freq.begin(); it != freq.end(); ++it) {
+        pq.push(new Node(it->first, it->second));
+    }
+
+    // Nếu chỉ có một ký tự, cây Huffman không tạo được nên gán mã là 1 bit
+    if (pq.size() == 1) {
+        Node* only = pq.top();
+        cout << only->freq << endl;
+        return 0;
+    }
+
+    while (pq.size() > 1) {
+        Node* left = pq.top(); pq.pop();
+        Node* right = pq.top(); pq.pop();
+        pq.push(new Node(left, right));
+    }
+
+    Node* root = pq.top();
+    map<char, int> codeLength;
+    getCodeLengths(root, 0, codeLength);
+
+    int totalBits = 0;
+    for (map<char, int>::iterator it = freq.begin(); it != freq.end(); ++it) {
+        totalBits += it->second * codeLength[it->first];
+    }
+
+    cout << totalBits << endl;
+
+    return 0;
+}

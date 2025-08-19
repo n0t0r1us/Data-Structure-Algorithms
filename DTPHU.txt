@@ -1,0 +1,142 @@
+#include <iostream>
+#include <vector>
+#include <algorithm>
+#include <cstdio>
+using namespace std;
+typedef long long ll;
+
+struct Event {
+    ll x;
+    ll y1, y2;
+    int type; // +1 add, -1 remove
+    Event() {}
+    Event(ll _x, ll _y1, ll _y2, int _t): x(_x), y1(_y1), y2(_y2), type(_t) {}
+    bool operator<(const Event& other) const {
+        if (x != other.x) return x < other.x;
+        return type > other.type; // add before remove if same x (not essential)
+    }
+};
+
+struct SegTree {
+    int n; // number of elementary intervals (ys.size()-1)
+    vector<int> cnt;
+    vector<ll> len;
+    vector<ll> ys; // coordinate array, size n+1
+
+    SegTree() { n = 0; }
+    SegTree(const vector<ll> &_ys) { build(_ys); }
+
+    void build(const vector<ll> &_ys) {
+        ys = _ys;
+        n = (int)ys.size() - 1;
+        int sz = max(1, n);
+        cnt.assign(4 * sz, 0);
+        len.assign(4 * sz, 0);
+    }
+
+    // update interval [l, r) on index space (0-based intervals)
+    void update(int node, int l, int r, int ql, int qr, int val) {
+        if (ql >= r || qr <= l) return;
+        if (ql <= l && r <= qr) {
+            cnt[node] += val;
+            if (cnt[node] > 0) {
+                // fully covered
+                len[node] = ys[r] - ys[l];
+            } else {
+                if (l + 1 == r) {
+                    // leaf interval
+                    len[node] = 0;
+                } else {
+                    len[node] = len[node*2] + len[node*2+1];
+                }
+            }
+            return;
+        }
+        int mid = (l + r) >> 1;
+        update(node*2, l, mid, ql, qr, val);
+        update(node*2+1, mid, r, ql, qr, val);
+        if (cnt[node] > 0) {
+            len[node] = ys[r] - ys[l];
+        } else {
+            len[node] = len[node*2] + len[node*2+1];
+        }
+    }
+
+    // helper
+    void add_range(int l, int r, int val) { // expects 0 <= l < r <= n
+        if (l >= r) return;
+        update(1, 0, n, l, r, val);
+    }
+
+    ll covered_length() const {
+        if (n <= 0) return 0;
+        return len[1];
+    }
+};
+
+// helper function (C++98 friendly) to find index of y in compressed ys
+int get_index(const vector<ll> &ys, ll y) {
+    return int(lower_bound(ys.begin(), ys.end(), y) - ys.begin());
+}
+
+int main(){
+    ios::sync_with_stdio(false);
+    cin.tie(0);
+
+    int m;
+    if (!(cin >> m)) return 0;
+    vector<Event> ev;
+    vector<ll> ys;
+    ys.reserve(2*m);
+    for (int i = 0; i < m; ++i) {
+        ll x, y, w, h;
+        cin >> x >> y >> w >> h;
+        ll x1 = x;
+        ll x2 = x + w;
+        ll y1 = y;
+        ll y2 = y + h;
+        ev.push_back(Event(x1, y1, y2, +1));
+        ev.push_back(Event(x2, y1, y2, -1));
+        ys.push_back(y1);
+        ys.push_back(y2);
+    }
+
+    if (ev.empty()) {
+        cout << 0 << "\n";
+        return 0;
+    }
+
+    // coordinate compress ys
+    sort(ys.begin(), ys.end());
+    ys.erase(unique(ys.begin(), ys.end()), ys.end());
+
+    // build segment tree with elementary intervals [ys[i], ys[i+1])
+    SegTree st(ys);
+
+    // sort events by x
+    sort(ev.begin(), ev.end());
+
+    ll prev_x = ev[0].x;
+    ll area = 0;
+    int total = (int)ev.size();
+    int i = 0;
+    while (i < total) {
+        ll cur_x = ev[i].x;
+        ll covered = st.covered_length();
+        ll dx = cur_x - prev_x;
+        if (dx > 0 && covered > 0) {
+            area += covered * dx;
+        }
+        // process all events at cur_x
+        while (i < total && ev[i].x == cur_x) {
+            int l = get_index(ys, ev[i].y1);
+            int r = get_index(ys, ev[i].y2);
+            st.add_range(l, r, ev[i].type);
+            ++i;
+        }
+        prev_x = cur_x;
+    }
+
+    cout << area << "\n";
+    return 0;
+}

@@ -1,0 +1,30 @@
+#include <iostream>
+using namespace std;
+
+int countLessEqual(int n, int m, int x) {
+    int count = 0;
+    for (int i = 1; i <= n; i++) {
+        count += min(m, x / i);
+    }
+    return count;
+}
+
+int findKthNumber(int n, int m, int k) {
+    int left = 1, right = n * m, mid;
+    while (left < right) {
+        mid = (left + right) / 2;
+        if (countLessEqual(n, m, mid) < k) {
+            left = mid + 1;
+        } else {
+            right = mid;
+        }
+    }
+    return left;
+}
+
+int main() {
+    int n, m, k;
+    cin >> n >> m >> k;
+    cout << findKthNumber(n, m, k) << endl;
+    return 0;
+}

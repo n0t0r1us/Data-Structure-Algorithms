@@ -1,0 +1,34 @@
+#include <iostream>
+#include <cmath>
+#include <string>
+#include <cstdlib>
+using namespace std;
+
+long double toLongDouble(const string &s) {
+    int len = s.length();
+    int take = min(15, len);
+    long double num = strtold(s.substr(0, take).c_str(), NULL);
+    return log10(num) + (len - take);
+}
+
+int main() {
+    ios::sync_with_stdio(false);
+    cin.tie(NULL);
+    int T;
+    cin >> T;
+    while (T--) {
+        string sN, sM;
+        cin >> sN >> sM;
+        if (sN == sM) {
+            cout << "YES\n";
+            continue;
+        }
+        long double logN = toLongDouble(sN);
+        long double logM = toLongDouble(sM);
+        long double cmp1 = logM * atof(sN.c_str());
+        long double cmp2 = logN * atof(sM.c_str());
+        if (fabsl(cmp1 - cmp2) < 1e-9) cout << "YES\n";
+        else cout << "NO\n";
+    }
+    return 0;
+}

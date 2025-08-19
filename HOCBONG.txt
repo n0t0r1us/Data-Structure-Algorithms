@@ -1,0 +1,51 @@
+#include <iostream>
+#include <vector>
+#include <algorithm>
+using namespace std;
+
+int main() {
+    int n, T;
+    cin >> n >> T;
+
+    vector<double> diem(n);
+
+    for (int i = 0; i < n; i++) {
+        cin >> diem[i];
+    }
+
+    vector<double> gioi, kha;
+
+    for (int i = 0; i < n; i++) {
+        if (diem[i] >= 8.0)
+            gioi.push_back(diem[i]);
+        else if (diem[i] >= 7.0)
+            kha.push_back(diem[i]);
+    }
+
+    sort(gioi.rbegin(), gioi.rend());
+    sort(kha.rbegin(), kha.rend());
+
+    int count = 0;
+
+    for (int i = 0; i < gioi.size(); i++) {
+        if (T >= 500) {
+            T -= 500;
+            count++;
+        } else {
+            cout << count << endl;
+            return 0;
+        }
+    }
+
+    for (int i = 0; i < kha.size(); i++) {
+        if (T >= 320) {
+            T -= 320;
+            count++;
+        } else {
+            break;
+        }
+    }
+
+    cout << count << endl;
+    return 0;
+}

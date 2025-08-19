@@ -1,0 +1,11 @@
+#include <iostream>
+using namespace std;
+
+int main() {
+    long long M, N;
+    if (!(cin >> M >> N)) return 0;
+    long long a = (M + 1) / 2;
+    long long b = (N + 1) / 2;
+    cout << a * b << endl;
+    return 0;
+}

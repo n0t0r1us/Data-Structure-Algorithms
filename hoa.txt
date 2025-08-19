@@ -1,0 +1,16 @@
+#include <iostream>
+
+using namespace std;
+
+int main() {
+    int n, m;
+    cin >> n >> m;
+
+    int max_teachers = min(n, m);
+    int max_possible = (n + m) / 3;
+    max_teachers = min(max_teachers, max_possible);
+
+    cout << max_teachers << endl;
+
+    return 0;
+}

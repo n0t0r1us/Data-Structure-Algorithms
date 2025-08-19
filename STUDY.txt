@@ -1,0 +1,55 @@
+#include <iostream>
+#include <vector>
+#include <cstring>
+using namespace std;
+
+const int MAXN = 105;
+
+int N, M;
+int C[MAXN][MAXN];
+int dp[MAXN][MAXN];
+int trace[MAXN][MAXN];
+
+int main() {
+    cin >> N >> M;
+
+    for (int i = 1; i <= N; ++i)
+        for (int j = 1; j <= M; ++j)
+            cin >> C[i][j];
+
+    // Khởi tạo mảng dp
+    for (int i = 0; i <= N; ++i)
+        for (int j = 0; j <= M; ++j)
+            dp[i][j] = -1;
+
+    dp[0][0] = 0;
+
+    for (int i = 1; i <= N; ++i) {
+        for (int j = 0; j <= M; ++j) {
+            for (int d = 0; d <= j; ++d) {
+                if (dp[i - 1][j - d] != -1) {
+                    int val = dp[i - 1][j - d] + C[i][d];
+                    if (val > dp[i][j]) {
+                        dp[i][j] = val;
+                        trace[i][j] = d;
+                    }
+                }
+            }
+        }
+    }
+
+    cout << dp[N][M] << endl;
+
+    int rem = M;
+    int res[MAXN];
+
+    for (int i = N; i >= 1; --i) {
+        res[i] = trace[i][rem];
+        rem -= res[i];
+    }
+
+    for (int i = 1; i <= N; ++i)
+        cout << res[i] << endl;
+
+    return 0;
+}

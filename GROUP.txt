@@ -1,0 +1,34 @@
+#include <iostream>
+#include <vector>
+using namespace std;
+typedef long long ll;
+const ll MOD = 1000000007LL;
+
+int main() {
+    ios::sync_with_stdio(false);
+    cin.tie(0);
+    int T;
+    if (!(cin >> T)) return 0;
+    vector<int> queries;
+    queries.reserve(T);
+    int maxN = 0;
+    for (int t = 0; t < T; ++t) {
+        int N; cin >> N;
+        queries.push_back(N);
+        if (N > maxN) maxN = N;
+    }
+    // dp for partitions of n using parts >= 2, order doesn't matter
+    vector<ll> dp(maxN + 1, 0);
+    dp[0] = 1;
+    for (int part = 2; part <= maxN; ++part) {
+        for (int s = part; s <= maxN; ++s) {
+            dp[s] += dp[s - part];
+            if (dp[s] >= MOD) dp[s] -= MOD;
+        }
+    }
+    for (int i = 0; i < T; ++i) {
+        int N = queries[i];
+        cout << dp[N] % MOD << '\n';
+    }
+    return 0;
+}

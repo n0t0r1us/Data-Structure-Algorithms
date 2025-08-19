@@ -1,0 +1,43 @@
+#include <iostream>
+#include <vector>
+#include <algorithm>
+using namespace std;
+
+struct Point {
+    int x;
+    int y;
+};
+
+bool cmp(const Point &a, const Point &b) {
+    return a.x < b.x;
+}
+
+int main() {
+    ios::sync_with_stdio(false);
+    cin.tie(0);
+
+    int N, K;
+    cin >> N >> K;
+    vector<Point> points(N);
+    for (int i = 0; i < N; i++) {
+        cin >> points[i].x >> points[i].y;
+    }
+
+    sort(points.begin(), points.end(), cmp);
+
+    long long maxUsers = 0, currentSum = 0;
+    int left = 0;
+
+    for (int right = 0; right < N; right++) {
+        currentSum += points[right].y;
+        while (points[right].x - points[left].x > 2 * K) {
+            currentSum -= points[left].y;
+            left++;
+        }
+        if (currentSum > maxUsers) maxUsers = currentSum;
+    }
+
+    cout << maxUsers << "\n";
+
+    return 0;
+}

@@ -1,0 +1,26 @@
+#include <iostream>
+using namespace std;
+
+const int MAX = 100005;
+int freq[MAX];
+
+int main() {
+    int n, x;
+    cin >> n;
+
+    // Đếm tần suất
+    for (int i = 0; i < n; i++) {
+        cin >> x;
+        freq[x]++;
+    }
+
+    long long total = 0;
+    for (int i = 1; i < MAX; i++) {
+        if (freq[i] >= 2) {
+            total += (long long)freq[i] * (freq[i] - 1) / 2;
+        }
+    }
+
+    cout << total << endl;
+    return 0;
+}

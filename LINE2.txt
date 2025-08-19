@@ -1,0 +1,75 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+#define MAX 10
+
+typedef struct {
+    int y, x;
+} Point;
+
+int n, sy, sx, dy, dx;
+int board[MAX][MAX];
+int visited[MAX][MAX];
+Point trace[MAX][MAX];
+
+int dy4[4] = {-1, 1, 0, 0}; // lên, xuống, trái, phải
+int dx4[4] = {0, 0, -1, 1};
+
+int in_board(int y, int x) {
+    return y >= 0 && y < n && x >= 0 && x < n;
+}
+
+void print_path(Point end) {
+    Point path[MAX * MAX];
+    int len = 0;
+    while (!(end.y == sy && end.x == sx)) {
+        path[len++] = end;
+        end = trace[end.y][end.x];
+    }
+    path[len++] = (Point){sy, sx};
+
+    printf("%d\n", len);
+    for (int i = len - 1; i >= 0; i--) {
+        printf("%d %d\n", path[i].y + 1, path[i].x + 1);
+    }
+}
+
+void bfs() {
+    Point queue[MAX * MAX];
+    int front = 0, rear = 0;
+
+    queue[rear++] = (Point){sy, sx};
+    visited[sy][sx] = 1;
+
+    while (front < rear) {
+        Point u = queue[front++];
+        for (int d = 0; d < 4; d++) {
+            int ny = u.y + dy4[d];
+            int nx = u.x + dx4[d];
+            if (in_board(ny, nx) && !visited[ny][nx] && board[ny][nx] == 0) {
+                visited[ny][nx] = 1;
+                trace[ny][nx] = u;
+                if (ny == dy && nx == dx) {
+                    print_path((Point){dy, dx});
+                    return;
+                }
+                queue[rear++] = (Point){ny, nx};
+            }
+        }
+    }
+    printf("0\n"); // không tìm được đường
+}
+
+int main() {
+    scanf("%d %d %d %d %d", &n, &sy, &sx, &dy, &dx);
+    sy--; sx--; dy--; dx--; // chuyển về chỉ số mảng 0-based
+
+    for (int i = 0; i < n; i++)
+        for (int j = 0; j < n; j++)
+            scanf("%d", &board[i][j]);
+
+    bfs();
+
+    return 0;
+}
+    

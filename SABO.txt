@@ -1,0 +1,46 @@
+#include <iostream>
+#include <vector>
+using namespace std;
+
+int main() {
+    ios::sync_with_stdio(false);
+    cin.tie(0);
+    const int MOD = 1000000;
+
+    int n, k;
+    if (!(cin >> n >> k)) return 0;
+
+    // dp[i][t][s], s=0/1
+    vector< vector< vector<int> > > dp(n+1, vector< vector<int> >(k+1, vector<int>(2,0)));
+
+    dp[0][0][0] = 1; // length 0, 0 trailing F, no M yet
+
+    for (int i = 0; i < n; ++i) {
+        for (int t = 0; t <= k; ++t) {
+            for (int s = 0; s <= 1; ++s) {
+                int cur = dp[i][t][s];
+                if (cur == 0) continue;
+                // Thêm F
+                int t2 = t + 1;
+                if (t2 > k) t2 = k;
+                dp[i+1][t2][s] += cur;
+                if (dp[i+1][t2][s] >= MOD) dp[i+1][t2][s] %= MOD;
+                // Thêm M
+                if (s == 0 || (s == 1 && t >= k)) {
+                    dp[i+1][0][1] += cur;
+                    if (dp[i+1][0][1] >= MOD) dp[i+1][0][1] %= MOD;
+                }
+            }
+        }
+    }
+
+    long long ans = 0;
+    for (int t = 0; t <= k; ++t) {
+        ans += dp[n][t][0];
+        if (ans >= MOD) ans %= MOD;
+        ans += dp[n][t][1];
+        if (ans >= MOD) ans %= MOD;
+    }
+    cout << ans % MOD << "\n";
+    return 0;
+}

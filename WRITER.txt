@@ -1,0 +1,60 @@
+#include <iostream>
+#include <map>
+#include <string>
+using namespace std;
+
+int main() {
+    map<char, pair<int, int> > keymap;
+    string keys[] = {
+        ".,?!1",   // 1
+        "abc2",    // 2
+        "def3",    // 3
+        "ghi4",    // 4
+        "jkl5",    // 5
+        "mno6",    // 6
+        "pqrs7",   // 7
+        "tuv8",    // 8
+        "wxyz9",   // 9
+        "_0"       // 0 (space được biểu diễn bằng '_')
+    };
+
+    // Build the map
+    for (int i = 0; i < 10; ++i) {
+        for (int j = 0; j < keys[i].size(); ++j) {
+            keymap[keys[i][j]] = make_pair(i == 9 ? 0 : i + 1, j + 1);
+        }
+    }
+
+    int T;
+    cin >> T;
+    cin.ignore();
+
+    while (T--) {
+        string s;
+        getline(cin, s);
+        int time = 0;
+        int currentKey = 1; // ban đầu ở phím '1'
+
+        for (int i = 0; i < s.size(); ++i) {
+            char c = s[i];
+            pair<int, int> info = keymap[c];
+            int targetKey = info.first;
+            int pressCount = info.second;
+
+            if (i == 0) {
+                // từ phím 1 sang ký tự đầu tiên
+                if (targetKey != 1) time += 1;
+            } else {
+                // nếu khác phím trước đó thì mất thêm 1s di chuyển
+                if (targetKey != currentKey) time += 1;
+            }
+
+            time += pressCount;
+            currentKey = targetKey;
+        }
+
+        cout << time << endl;
+    }
+
+    return 0;
+}

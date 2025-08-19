@@ -1,0 +1,125 @@
+#include <iostream>
+#include <vector>
+#include <map>
+#include <algorithm>
+#include <cstdio>
+using namespace std;
+
+/* Simple big integer for non-negative integers, base 1e9 */
+struct BigInt {
+    static const int BASE = 1000000000;
+    vector<int> d; // little-endian
+    BigInt() { d.clear(); }
+    void set1() { d.clear(); d.push_back(1); }
+    void set0() { d.clear(); }
+    bool isZero() const { return d.empty(); }
+    void mulInt(int m) {
+        if (m == 0 || isZero()) { d.clear(); return; }
+        long long carry = 0;
+        for (size_t i = 0; i < d.size(); ++i) {
+            long long cur = 1LL * d[i] * m + carry;
+            d[i] = int(cur % BASE);
+            carry = cur / BASE;
+        }
+        while (carry) {
+            d.push_back(int(carry % BASE));
+            carry /= BASE;
+        }
+    }
+    string toString() const {
+        if (d.empty()) return string("0");
+        char buf[32];
+        int n = (int)d.size();
+        sprintf(buf, "%d", d[n-1]);
+        string s = buf;
+        for (int i = n-2; i >= 0; --i) {
+            sprintf(buf, "%09d", d[i]);
+            s += buf;
+        }
+        return s;
+    }
+};
+
+int main() {
+    ios::sync_with_stdio(false);
+    cin.tie(0);
+
+    // Precompute primes up to 200 (safe upper bound for factorization of numbers <= ~50)
+    const int PMAX = 200;
+    vector<int> primes;
+    vector<char> isP(PMAX+1, 1);
+    isP[0] = isP[1] = 0;
+    for (int i = 2; i <= PMAX; ++i) if (isP[i]) {
+        primes.push_back(i);
+        if ((long long)i * i <= PMAX) {
+            for (int j = i*i; j <= PMAX; j += i) isP[j] = 0;
+        }
+    }
+
+    // Read many test cases until EOF
+    while (true) {
+        int M;
+        if (!(cin >> M)) break;
+        vector<int> A(M);
+        for (int i = 0; i < M; ++i) cin >> A[i];
+        int N;
+        cin >> N;
+
+        // shape lambda: rows A[0..M-1], already nonincreasing
+        // compute column lengths lambda'_j: number of rows with length >= j
+        int maxLen = 0;
+        for (int i = 0; i < M; ++i) if (A[i] > maxLen) maxLen = A[i];
+        vector<int> collen(maxLen+1, 0); // 1-based j
+        for (int j = 1; j <= maxLen; ++j) {
+            int cnt = 0;
+            for (int i = 0; i < M; ++i) if (A[i] >= j) ++cnt;
+            collen[j] = cnt;
+        }
+
+        // accumulate prime exponents (map prime -> exponent)
+        map<int,long long> expo;
+        // For each cell (i,j) with 1-based indices
+        for (int i = 1; i <= M; ++i) {
+            for (int j = 1; j <= A[i-1]; ++j) {
+                int numer = N + j - i; // numerator factor
+                int hook = A[i-1] - j + collen[j] - i + 1; // hook length
+                // factor numer
+                int x = numer;
+                int tx = x;
+                for (size_t pi = 0; pi < primes.size() && primes[pi]*primes[pi] <= tx; ++pi) {
+                    int p = primes[pi];
+                    while (x % p == 0) {
+                        expo[p] += 1;
+                        x /= p;
+                    }
+                }
+                if (x > 1) expo[x] += 1;
+                // factor denominator (hook)
+                int y = hook;
+                int ty = y;
+                for (size_t pi = 0; pi < primes.size() && primes[pi]*primes[pi] <= ty; ++pi) {
+                    int p = primes[pi];
+                    while (y % p == 0) {
+                        expo[p] -= 1;
+                        y /= p;
+                    }
+                }
+                if (y > 1) expo[y] -= 1;
+            }
+        }
+
+        // Now expo may have negative exponents (should not happen), but we expect all nonnegative.
+        // Compute result by multiplying primes^exp for exp>0
+        BigInt res; res.set1();
+        for (map<int,long long>::iterator it = expo.begin(); it != expo.end(); ++it) {
+            int p = it->first;
+            long long e = it->second;
+            if (e <= 0) continue;
+            // multiply res by p^e by repeated multiplication (e small here)
+            for (long long t = 0; t < e; ++t) res.mulInt(p);
+        }
+        cout << res.toString() << "\n";
+    }
+
+    return 0;
+}

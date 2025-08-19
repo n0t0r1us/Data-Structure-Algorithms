@@ -1,0 +1,29 @@
+#include <iostream>
+using namespace std;
+
+int main() {
+    int n;
+    cout << " ";
+    cin >> n;
+
+    int pascalTriangle[50][50];
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j <= i; j++) {
+            if (j == 0 || j == i) {
+                pascalTriangle[i][j] = 1;
+            } else {
+                pascalTriangle[i][j] = pascalTriangle[i - 1][j - 1] + pascalTriangle[i - 1][j];
+            }
+        }
+    }
+
+    // In tam giác Pascal
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j <= i; j++) {
+            cout << pascalTriangle[i][j] << " ";
+        }
+        cout << endl;
+    }
+
+    return 0;
+}

@@ -1,0 +1,47 @@
+#include <iostream>
+#include <vector>
+using namespace std;
+
+int main() {
+    ios::sync_with_stdio(false);
+    cin.tie(0);
+
+    int T;
+    if (!(cin >> T)) return 0;
+    vector<int> Ns(T);
+    int maxN = 0;
+    for (int i = 0; i < T; ++i) {
+        cin >> Ns[i];
+        if (Ns[i] > maxN) maxN = Ns[i];
+    }
+
+    if (maxN < 1) maxN = 1;
+    int LIMIT = maxN;
+
+    // Sieve of Eratosthenes up to LIMIT
+    vector<char> is_prime(LIMIT + 1, 1);
+    is_prime.assign(LIMIT + 1, 1);
+    is_prime[0] = 0;
+    if (LIMIT >= 1) is_prime[1] = 0;
+    for (int p = 2; (long long)p * p <= LIMIT; ++p) {
+        if (is_prime[p]) {
+            for (int q = p * p; q <= LIMIT; q += p) is_prime[q] = 0;
+        }
+    }
+
+    // prefix counts pi[i]
+    vector<int> pi(LIMIT + 1, 0);
+    int cnt = 0;
+    for (int i = 0; i <= LIMIT; ++i) {
+        if (i >= 2 && is_prime[i]) ++cnt;
+        pi[i] = cnt;
+    }
+
+    for (int tc = 0; tc < T; ++tc) {
+        int N = Ns[tc];
+        int ans = pi[N] + 1; // include 1
+        cout << "Case #" << (tc + 1) << ": " << ans;
+        if (tc + 1 < T) cout << '\n';
+    }
+    return 0;
+}

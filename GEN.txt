@@ -1,0 +1,53 @@
+#include <iostream>
+#include <string>
+#include <map>
+#include <set>
+#include <vector>
+using namespace std;
+
+int N, K;
+vector<string> DNA;
+
+// Hàm kiểm tra có tồn tại đoạn con độ dài 'len' xuất hiện trong >= K chuỗi khác nhau không
+bool check(int len) {
+    map<string, set<int> > countMap;
+
+    for (int i = 0; i < N; i++) {
+        string &s = DNA[i];
+        for (int j = 0; j <= 30 - len; j++) {
+            string sub = s.substr(j, len);
+            countMap[sub].insert(i); // đánh dấu chuỗi thứ i có chứa sub
+        }
+    }
+
+    for (map<string, set<int> >::iterator it = countMap.begin(); it != countMap.end(); ++it) {
+        if (it->second.size() >= K) return true;
+    }
+    return false;
+}
+
+int main() {
+    cin >> N >> K;
+    DNA.resize(N);
+
+    for (int i = 0; i < N; i++) {
+        cin >> DNA[i];
+    }
+
+    int left = 1, right = 30;
+    int ans = -1;
+
+    while (left <= right) {
+        int mid = (left + right) / 2;
+        if (check(mid)) {
+            ans = mid;
+            left = mid + 1;
+        } else {
+            right = mid - 1;
+        }
+    }
+
+    cout << ans << endl;
+    return 0;
+}
+    

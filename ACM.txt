@@ -1,0 +1,24 @@
+#include <bits/stdc++.h>
+using namespace std;
+
+int main() {
+    ios::sync_with_stdio(false);
+    cin.tie(NULL);
+
+    int N;
+    cin >> N;
+    vector<long long> a(N);
+    for (int i = 0; i < N; i++) cin >> a[i];
+
+    sort(a.begin(), a.end()); // sắp xếp tăng dần
+
+    long long total = 0;
+    long long current_time = 0;
+    for (int i = 0; i < N; i++) {
+        current_time += a[i];
+        total += current_time;
+    }
+
+    cout << total << "\n";
+    return 0;
+}

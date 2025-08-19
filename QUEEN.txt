@@ -1,0 +1,59 @@
+#include <iostream>
+#include <vector>
+#include <cmath>
+using namespace std;
+
+const int N = 8;
+int y_input, x_input;
+int col[N]; // col[i] = c nghĩa là dòng i đặt quân hậu ở cột c
+bool done = false;
+
+bool safe(int row, int c) {
+    for (int i = 0; i < row; ++i) {
+        if (col[i] == c || abs(i - row) == abs(col[i] - c)) {
+            return false; // cùng cột hoặc cùng đường chéo
+        }
+    }
+    return true;
+}
+
+void solve(int row) {
+    if (done) return;
+    if (row == N) {
+        // In bàn cờ
+        for (int i = 0; i < N; ++i) {
+            for (int j = 0; j < N; ++j) {
+                if (col[i] == j) cout << 'w';
+                else cout << '.';
+            }
+            cout << '\n';
+        }
+        done = true;
+        return;
+    }
+
+    if (row == y_input) {
+        // Dòng đã cố định vị trí cột
+        if (safe(row, x_input)) {
+            col[row] = x_input;
+            solve(row + 1);
+        }
+    } else {
+        for (int c = 0; c < N; ++c) {
+            if (safe(row, c)) {
+                col[row] = c;
+                solve(row + 1);
+            }
+        }
+    }
+}
+
+int main() {
+    int y, x;
+    cin >> y >> x;
+    y_input = y - 1;
+    x_input = x - 1;
+
+    solve(0);
+    return 0;
+}

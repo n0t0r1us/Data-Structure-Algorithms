@@ -1,0 +1,43 @@
+#include <iostream>
+#include <vector>
+using namespace std;
+
+const int MAXN = 1000005;
+
+int diff[MAXN] = {0};      // Mảng hiệu
+int cnt[MAXN] = {0};       // Số tiền từng hộp
+int freq[MAXN] = {0};      // freq[i] = số hộp có đúng i đồng
+int sum_ge[MAXN] = {0};    // sum_ge[i] = số hộp có ≥ i đồng
+
+int main() {
+    int N, M;
+    cin >> N >> M;
+
+    for (int i = 0; i < M; ++i) {
+        int L, R;
+        cin >> L >> R;
+        diff[L] += 1;
+        diff[R + 1] -= 1;
+    }
+
+    // Tính số đồng từng hộp
+    for (int i = 1; i <= N; ++i) {
+        cnt[i] = cnt[i - 1] + diff[i];
+        freq[cnt[i]]++;
+    }
+
+    // Tính prefix sum từ N về 0
+    for (int i = N; i >= 0; --i) {
+        sum_ge[i] = freq[i] + sum_ge[i + 1];
+    }
+
+    int Q;
+    cin >> Q;
+    while (Q--) {
+        int X;
+        cin >> X;
+        cout << sum_ge[X] << endl;
+    }
+
+    return 0;
+}

@@ -1,0 +1,36 @@
+#include <bits/stdc++.h>
+using namespace std;
+
+struct Task {
+    int a, b, c, d;
+    bool done;
+};
+
+int main() {
+    ios::sync_with_stdio(false);
+    cin.tie(NULL);
+    int n;
+    long long T, P;
+    cin >> n >> T >> P;
+    vector<Task> tasks(n);
+    for (int i = 0; i < n; i++) {
+        cin >> tasks[i].a >> tasks[i].b >> tasks[i].c >> tasks[i].d;
+        tasks[i].done = false;
+    }
+    int solved = 0;
+    bool progress = true;
+    while (progress) {
+        progress = false;
+        for (int i = 0; i < n; i++) {
+            if (!tasks[i].done && T >= tasks[i].a && P >= tasks[i].b) {
+                T += tasks[i].c;
+                P += tasks[i].d;
+                tasks[i].done = true;
+                solved++;
+                progress = true;
+            }
+        }
+    }
+    cout << solved;
+    return 0;
+}

@@ -1,0 +1,73 @@
+#include <iostream>
+#include <vector>
+#include <map>
+using namespace std;
+int main() {
+    long long N, K;
+    if (!(cin >> N >> K)) return 0;
+    long long q0 = N / 100;
+    int r0 = (int)(N % 100);
+
+    // simulate r_t until cycle
+    map<int,int> firstPos; // remainder -> position index in seq
+    vector<int> remList;   // remList[t] = r_t
+    vector<int> carry;     // carry[t] = 1 if r_t >= 50 else 0
+
+    int cur = r0;
+    int pos = 0;
+    while (firstPos.count(cur) == 0) {
+        firstPos[cur] = pos;
+        remList.push_back(cur);
+        carry.push_back(cur >= 50 ? 1 : 0);
+        cur = (cur * 2) % 100;
+        pos++;
+    }
+    int startCycle = firstPos[cur];
+    int preLen = startCycle;
+    int cycleLen = pos - startCycle;
+
+    // If K steps all lie before encountering a repeat (i.e., K <= remList.size())
+    // But careful: we need r_t for t=0..K (we need carry for t=0..K-1)
+    // We computed remList for t=0..pos-1 (pos = preLen + cycleLen)
+    // If K <= pos then we can just sum first K carries and take r_K accordingly.
+
+    long long totalCarries = 0;
+    int rK = 0;
+
+    if (K <= (long long)pos) {
+        // sum carries for t=0..K-1
+        for (long long i = 0; i < K; ++i) totalCarries += carry[(size_t)i];
+        // r_K is remList[K] if K < pos, else it's cur (but K<=pos and cur is remList[pos] which equals remList[startCycle])
+        if (K < (long long)pos) rK = remList[(size_t)K];
+        else rK = cur; // exact repeating point
+    } else {
+        // Sum carries on pre-period
+        long long sumPre = 0;
+        for (int i = 0; i < preLen; ++i) sumPre += carry[i];
+
+        // Sum carries on one cycle
+        long long sumCycle = 0;
+        for (int i = preLen; i < preLen + cycleLen; ++i) sumCycle += carry[i];
+
+        long long remSteps = K - preLen; // steps that are in cycles region
+        long long fullCycles = remSteps / cycleLen;
+        long long tail = remSteps % cycleLen;
+
+        totalCarries = sumPre + sumCycle * fullCycles;
+        // tail contribution
+        for (int i = 0; i < (int)tail; ++i) totalCarries += carry[preLen + i];
+
+        // r_K:
+        if (K < (long long)pos) {
+            rK = remList[(size_t)K];
+        } else {
+            long long idxInCycle = (K - preLen) % cycleLen;
+            rK = remList[(size_t)(preLen + idxInCycle)];
+        }
+    }
+
+    long long qK = q0 + totalCarries;
+    long long XK = qK * 100LL + rK;
+    cout << XK << "\n";
+    return 0;
+}

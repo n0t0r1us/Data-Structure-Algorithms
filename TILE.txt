@@ -1,0 +1,27 @@
+#include <iostream>
+#include <algorithm>
+using namespace std;
+
+int a[105];
+
+int main() {
+    int n;
+    cin >> n;
+
+    for (int i = 0; i < n; i++) {
+        cin >> a[i];
+    }
+
+    sort(a, a + n); // sắp xếp độ cứng tăng dần
+
+    int cnt = 0; // chiều cao chồng gạch
+
+    for (int i = 0; i < n; i++) {
+        if (a[i] >= cnt) {
+            cnt++; // đặt được viên gạch này vào dưới
+        }
+    }
+
+    cout << cnt << endl;
+    return 0;
+}

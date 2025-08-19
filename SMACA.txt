@@ -1,0 +1,79 @@
+#include <iostream>
+#include <vector>
+#include <map>
+#include <cmath>
+using namespace std;
+typedef long long ll;
+
+// sieve primes up to MAXP
+void sieve_primes(int MAXP, vector<int> &pr) {
+    vector<char> is(MAXP+1, 1);
+    is[0]=is[1]=0;
+    for (int i=2;i*i<=MAXP;i++) if (is[i]) {
+        for (int j=i*i;j<=MAXP;j+=i) is[j]=0;
+    }
+    for (int i=2;i<=MAXP;i++) if (is[i]) pr.push_back(i);
+}
+
+// factor x into map prime->exponent using prime list
+void factor_num(ll x, const vector<int> &pr, map<ll,int> &mp) {
+    ll v = x;
+    for (size_t i=0;i<pr.size() && (ll)pr[i]*(ll)pr[i] <= v; ++i) {
+        int p = pr[i];
+        if (v % p == 0) {
+            int cnt = 0;
+            while (v % p == 0) { v /= p; ++cnt; }
+            mp[p] += cnt;
+        }
+    }
+    if (v > 1) mp[v] += 1;
+}
+
+int main(){
+    ios::sync_with_stdio(false);
+    cin.tie(0);
+    int m, n;
+    if (!(cin >> m >> n)) return 0;
+    vector<ll> K(m);
+    for (int i=0;i<m;i++) cin >> K[i];
+    vector< vector<ll> > X(n, vector<ll>(m));
+    for (int i=0;i<n;i++){
+        for (int j=0;j<m;j++) cin >> X[i][j];
+    }
+
+    // prepare primes up to sqrt(1e9)
+    vector<int> primes;
+    sieve_primes(31623, primes);
+
+    // factor product of K: accumulate exponents
+    map<ll,int> expK;
+    for (int i=0;i<m;i++) {
+        factor_num(K[i], primes, expK);
+    }
+
+    vector<int> opened;
+    for (int room = 0; room < n; ++room) {
+        map<ll,int> expX;
+        for (int j=0;j<m;j++) factor_num(X[room][j], primes, expX);
+        bool ok = true;
+        for (map<ll,int>::iterator it = expX.begin(); it != expX.end(); ++it) {
+            ll p = it->first;
+            int need = it->second;
+            int have = 0;
+            map<ll,int>::iterator it2 = expK.find(p);
+            if (it2 != expK.end()) have = it2->second;
+            if (have < need) { ok = false; break; }
+        }
+        if (ok) opened.push_back(room+1); // 1-based index
+    }
+
+    cout << opened.size() << "\n";
+    if (!opened.empty()) {
+        for (size_t i=0;i<opened.size();++i) {
+            if (i) cout << " ";
+            cout << opened[i];
+        }
+        cout << "\n";
+    }
+    return 0;
+}

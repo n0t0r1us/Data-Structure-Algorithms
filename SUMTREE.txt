@@ -1,0 +1,74 @@
+#include <iostream>
+#include <vector>
+#include <cstdio>
+using namespace std;
+
+typedef long long ll;
+const int MAXN = 100005;
+
+struct Edge {
+    int to;
+    int weight;
+};
+
+vector<Edge> adj[MAXN];
+ll dp[MAXN], res[MAXN];
+int subtree_size[MAXN];
+int N;
+
+void dfs1(int u, int parent) {
+    subtree_size[u] = 1;
+    dp[u] = 0;
+    for (int i = 0; i < adj[u].size(); ++i) {
+        int v = adj[u][i].to;
+        int w = adj[u][i].weight;
+        if (v == parent) continue;
+        dfs1(v, u);
+        dp[u] += dp[v] + (ll)subtree_size[v] * w;
+        subtree_size[u] += subtree_size[v];
+    }
+}
+
+void dfs2(int u, int parent) {
+    for (int i = 0; i < adj[u].size(); ++i) {
+        int v = adj[u][i].to;
+        int w = adj[u][i].weight;
+        if (v == parent) continue;
+        res[v] = res[u] - (ll)subtree_size[v] * w + (ll)(N - subtree_size[v]) * w;
+        dfs2(v, u);
+    }
+}
+
+int main() {
+    int T;
+    scanf("%d", &T);
+    while (T--) {
+        scanf("%d", &N);
+
+        // clear
+        for (int i = 1; i <= N; ++i) {
+            adj[i].clear();
+            dp[i] = 0;
+            res[i] = 0;
+            subtree_size[i] = 0;
+        }
+
+        // input
+        for (int i = 0; i < N - 1; ++i) {
+            int u, v, w;
+            scanf("%d%d%d", &u, &v, &w);
+            Edge e1 = {v, w}, e2 = {u, w};
+            adj[u].push_back(e1);
+            adj[v].push_back(e2);
+        }
+
+        dfs1(1, 0);
+        res[1] = dp[1];
+        dfs2(1, 0);
+
+        for (int i = 1; i <= N; ++i) {
+            printf("%lld\n", res[i]);
+        }
+    }
+    return 0;
+}

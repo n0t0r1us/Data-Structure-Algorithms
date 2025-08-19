@@ -1,0 +1,93 @@
+#include <bits/stdc++.h>
+using namespace std;
+
+struct Point {
+    int x, y;
+};
+
+long long dist2(Point a, Point b) {
+    long long dx = a.x - b.x;
+    long long dy = a.y - b.y;
+    return dx * dx + dy * dy;
+}
+
+long long dot(Point a, Point b, Point c) {
+    long long v1x = a.x - b.x;
+    long long v1y = a.y - b.y;
+    long long v2x = c.x - b.x;
+    long long v2y = c.y - b.y;
+    return v1x * v2x + v1y * v2y;
+}
+
+bool isRightAngle(Point a, Point b, Point c) {
+    return dot(a, b, c) == 0;
+}
+
+bool isParallelogram(Point p[4]) {
+    long long vx1 = p[1].x - p[0].x;
+    long long vy1 = p[1].y - p[0].y;
+    long long vx3 = p[2].x - p[3].x;
+    long long vy3 = p[2].y - p[3].y;
+
+    long long vx2 = p[2].x - p[1].x;
+    long long vy2 = p[2].y - p[1].y;
+    long long vx4 = p[3].x - p[0].x;
+    long long vy4 = p[3].y - p[0].y;
+
+    return (vx1 * vy3 == vy1 * vx3) && (vx2 * vy4 == vy2 * vx4);
+}
+
+bool cmpPoint(const Point &a, const Point &b, double cx, double cy) {
+    double angA = atan2((double)a.y - cy, (double)a.x - cx);
+    double angB = atan2((double)b.y - cy, (double)b.x - cx);
+    return angA < angB;
+}
+
+int main() {
+    ios::sync_with_stdio(false);
+    cin.tie(NULL);
+    Point p[4];
+    for (int i = 0; i < 4; i++) {
+        cin >> p[i].x >> p[i].y;
+    }
+    double cx = 0, cy = 0;
+    for (int i = 0; i < 4; i++) {
+        cx += p[i].x;
+        cy += p[i].y;
+    }
+    cx /= 4; cy /= 4;
+    for (int i = 0; i < 4; i++) {
+        for (int j = i + 1; j < 4; j++) {
+            if (!cmpPoint(p[i], p[j], cx, cy)) {
+                Point tmp = p[i];
+                p[i] = p[j];
+                p[j] = tmp;
+            }
+        }
+    }
+    long long d[4];
+    for (int i = 0; i < 4; i++) {
+        d[i] = dist2(p[i], p[(i+1)%4]);
+    }
+    bool allSidesEqual = (d[0] == d[1] && d[1] == d[2] && d[2] == d[3]);
+    bool oppSidesEqual = (d[0] == d[2] && d[1] == d[3]);
+    bool allRight = true;
+    for (int i = 0; i < 4; i++) {
+        if (!isRightAngle(p[(i+3)%4], p[i], p[(i+1)%4])) {
+            allRight = false;
+            break;
+        }
+    }
+    if (allRight && allSidesEqual) {
+        cout << 1 << "\n";
+    } else if (allRight && oppSidesEqual) {
+        cout << 2 << "\n";
+    } else if (!allRight && allSidesEqual) {
+        cout << 3 << "\n";
+    } else if (isParallelogram(p)) {
+        cout << 4 << "\n";
+    } else {
+        cout << 5 << "\n";
+    }
+    return 0;
+}

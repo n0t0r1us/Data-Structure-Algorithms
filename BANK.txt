@@ -1,0 +1,44 @@
+#include <bits/stdc++.h>
+using namespace std;
+typedef long long ll;
+
+int findp(vector<int> &p, int x) {
+    if (x < 0) return -1;
+    if (p[x] == x) return x;
+    return p[x] = findp(p, p[x]);
+}
+
+int main() {
+    ios::sync_with_stdio(false);
+    cin.tie(0);
+    int n;
+    if (!(cin >> n)) return 0;
+    vector<pair<int,int> > jobs; // (a, t)
+    jobs.reserve(n);
+    int maxT = 0;
+    for (int i = 0; i < n; ++i) {
+        int a,t;
+        cin >> a >> t;
+        jobs.push_back(make_pair(a,t));
+        if (t > maxT) maxT = t;
+    }
+    // sort by a desc
+    sort(jobs.begin(), jobs.end(), greater<pair<int,int> >());
+    // DSU parent for slots 0..maxT
+    vector<int> parent(maxT+1);
+    for (int i = 0; i <= maxT; ++i) parent[i] = i;
+    ll ans = 0;
+    for (int i = 0; i < n; ++i) {
+        int a = jobs[i].first;
+        int t = jobs[i].second;
+        if (t > maxT) t = maxT;
+        int slot = findp(parent, t);
+        if (slot >= 0) {
+            ans += a;
+            // mark slot used: union slot with slot-1
+            parent[slot] = (slot-1 >= 0 ? findp(parent, slot-1) : -1);
+        }
+    }
+    cout << ans << '\n';
+    return 0;
+}

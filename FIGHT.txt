@@ -1,0 +1,19 @@
+#include <iostream>
+using namespace std;
+
+int main() {
+    int n, k;
+    cin >> n >> k;
+
+    int a = n / k;
+    int r = n % k;
+
+    // sum_xi2 = r*(a+1)^2 + (k-r)*a^2
+    long long sum_xi2 = (long long)r * (a + 1) * (a + 1) + (long long)(k - r) * a * a;
+
+    long long res = ((long long)n * n - sum_xi2) / 2;
+
+    cout << res << endl;
+
+    return 0;
+}

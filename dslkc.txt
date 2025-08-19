@@ -1,0 +1,74 @@
+#include <iostream>
+using namespace std;
+
+struct Node {
+    int data;
+    Node* next;
+};
+
+void InitList(Node*& head) {
+    head = NULL;
+}
+
+Node* MakeNode(int x) {
+    Node* p = new Node;
+    p->data = x;
+    p->next = NULL;
+    return p;
+}
+
+void InsertLast(Node*& head, int x) {
+    Node* p = MakeNode(x);
+    if (head == NULL) {
+        head = p;
+    } else {
+        Node* temp = head;
+        while (temp->next != NULL)
+            temp = temp->next;
+        temp->next = p;
+    }
+}
+
+void PrintList(Node* head) {
+    Node* p = head;
+    while (p != NULL) {
+        cout << p->data << " ";
+        p = p->next;
+    }
+    cout << endl;
+}
+
+// Truy xuất giá trị phần tử thứ i (bắt đầu từ 0)
+int Get(Node* head, int i) {
+    int index = 0;
+    Node* p = head;
+    while (p != NULL) {
+        if (index == i)
+            return p->data;
+        index++;
+        p = p->next;
+    }
+    return -1; // vị trí không hợp lệ
+}
+
+int main() {
+    Node* head;
+    InitList(head);
+
+    int n, x;
+    cin >> n;
+    for (int i = 0; i < n; i++) {
+        cin >> x;
+        InsertLast(head, x);
+    }
+
+    int pos;
+    cin >> pos;
+    int result = Get(head, pos);
+    if (result != -1)
+        cout << result << endl;
+    else
+        cout << "Vi tri khong hop le" << endl;
+
+    return 0;
+}

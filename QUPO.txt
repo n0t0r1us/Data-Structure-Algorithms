@@ -1,0 +1,90 @@
+#include <iostream>
+#include <queue>
+#include <cstring>
+using namespace std;
+
+const int ROWS = 10;
+const int COLS = 9;
+
+bool inside(int y, int x) {
+    return y >= 0 && y < ROWS && x >= 0 && x < COLS;
+}
+
+int dy[4] = {-1, 1, 0, 0}; // trên, dưới, trái, phải
+int dx[4] = {0, 0, -1, 1};
+
+int main() {
+    int y1, x1, y2, x2, y3, x3;
+    cin >> y1 >> x1;
+    cin >> y2 >> x2;
+    cin >> y3 >> x3;
+
+    // đánh dấu ô cản (quân trung gian)
+    bool block[ROWS][COLS];
+    memset(block, 0, sizeof(block));
+    block[y3][x3] = true;
+
+    // đánh dấu đã thăm
+    bool visited[ROWS][COLS];
+    memset(visited, 0, sizeof(visited));
+
+    queue<pair< pair<int, int>, int> > q;
+    q.push(make_pair(make_pair(y1, x1), 0));
+    visited[y1][x1] = true;
+
+    while (!q.empty()) {
+        int y = q.front().first.first;
+        int x = q.front().first.second;
+        int step = q.front().second;
+        q.pop();
+
+        // Kiểm tra nếu có thể ăn địch tại đây
+        for (int dir = 0; dir < 4; ++dir) {
+            int by = y + dy[dir];
+            int bx = x + dx[dir];
+
+            // Tìm quân trung gian đầu tiên theo hướng dir
+            while (inside(by, bx) && !block[by][bx]) {
+                by += dy[dir];
+                bx += dx[dir];
+            }
+
+            if (!inside(by, bx)) continue; // Không có quân trung gian
+
+            // Sau quân trung gian, tiếp tục xem có quân địch không
+            int ey = by + dy[dir];
+            int ex = bx + dx[dir];
+
+            while (inside(ey, ex)) {
+                if (ey == y2 && ex == x2) {
+                    // Có thể ăn quân địch
+                    cout << step + 1 << endl;
+                    return 0;
+                }
+                if (block[ey][ex]) break; // bị cản
+                ey += dy[dir];
+                ex += dx[dir];
+            }
+        }
+
+        // Di chuyển bình thường theo 4 hướng
+        for (int dir = 0; dir < 4; ++dir) {
+            int ny = y + dy[dir];
+            int nx = x + dx[dir];
+
+            while (inside(ny, nx) && !(ny == y3 && nx == x3) && !(ny == y2 && nx == x2)) {
+                if (!visited[ny][nx]) {
+                    visited[ny][nx] = true;
+                    q.push(make_pair(make_pair(ny, nx), step + 1));
+                }
+                ny += dy[dir];
+                nx += dx[dir];
+            }
+        }
+    }
+
+    // Không thể ăn được quân địch
+    cout << -1 << endl;
+    return 0;
+}
+

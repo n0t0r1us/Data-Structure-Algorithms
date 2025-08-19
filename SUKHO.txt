@@ -1,0 +1,33 @@
+#include <iostream>
+#include <vector>
+using namespace std;
+
+int main() {
+    int N, M, K;
+    cin >> N >> M >> K;
+
+    vector<int> A(N);
+    for (int i = 0; i < N; ++i)
+        cin >> A[i];
+
+    vector<int> dp(M + 1, 0);
+    dp[0] = 1;
+
+    for (int i = 0; i < N; ++i) {
+        int cal = A[i];
+        for (int j = M; j >= cal; --j) {
+            dp[j] += dp[j - cal];
+            if (dp[M] >= K) {
+                cout << "ENOUGH" << endl;
+                return 0;
+            }
+        }
+    }
+
+    if (dp[M] >= K)
+        cout << "ENOUGH" << endl;
+    else
+        cout << dp[M] << endl;
+
+    return 0;
+}

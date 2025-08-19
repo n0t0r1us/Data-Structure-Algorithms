@@ -1,0 +1,51 @@
+#include <iostream>
+#include <vector>
+#include <cstring>
+using namespace std;
+
+int main() {
+    ios::sync_with_stdio(false);
+    cin.tie(0);
+
+    int n, m, k;
+    if (!(cin >> n >> m >> k)) return 0;
+
+    vector<char> H(n+1, 0); // H[0..n]
+    vector<char> V(m+1, 0); // V[0..m]
+
+    for (int t = 0; t < k; ++t) {
+        char c;
+        int idx;
+        cin >> c >> idx;
+        if (c == 'H' || c == 'h') {
+            if (0 <= idx && idx <= n) H[idx] = 1;
+        } else if (c == 'V' || c == 'v') {
+            if (0 <= idx && idx <= m) V[idx] = 1;
+        }
+    }
+
+    // cntH[p] = số hàng ô (h-index) có h = p, với p=0..2
+    long long cntH[3] = {0,0,0};
+    for (int i = 1; i <= n; ++i) {
+        int h = (int)H[i-1] + (int)H[i];
+        if (h >=0 && h <=2) cntH[h]++;
+    }
+
+    long long cntV[3] = {0,0,0};
+    for (int j = 1; j <= m; ++j) {
+        int v = (int)V[j-1] + (int)V[j];
+        if (v >=0 && v <=2) cntV[v]++;
+    }
+
+    // a[s] = sum_{p+q = s} cntH[p] * cntV[q]
+    long long a[5] = {0,0,0,0,0};
+    for (int p = 0; p <= 2; ++p) {
+        for (int q = 0; q <= 2; ++q) {
+            int s = p + q;
+            a[s] += cntH[p] * cntV[q];
+        }
+    }
+
+    cout << a[0] << " " << a[1] << " " << a[2] << " " << a[3] << " " << a[4] << "\n";
+    return 0;
+}

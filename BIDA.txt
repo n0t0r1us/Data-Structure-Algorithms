@@ -1,0 +1,19 @@
+#include <bits/stdc++.h>
+using namespace std;
+typedef long long ll;
+
+ll finalPos(ll len, ll start, ll steps) {
+    ll cycle = 2 * (len - 1);
+    ll pos = (start - 1 + steps) % cycle;
+    if (pos >= len) pos = cycle - pos;
+    return pos + 1;
+}
+
+int main() {
+    ll n, m, y, x, k;
+    cin >> n >> m >> y >> x >> k;
+    ll yd = finalPos(n, y, k);
+    ll xd = finalPos(m, x, k);
+    cout << yd << " " << xd << "\n";
+    return 0;
+}

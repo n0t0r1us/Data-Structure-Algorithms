@@ -1,0 +1,24 @@
+#include <iostream>
+using namespace std;
+
+const int MOD = 1000007;
+
+int main() {
+    int n;
+    cin >> n;
+
+    if (n == 1 || n == 2) {
+        cout << 1 << endl;
+        return 0;
+    }
+
+    int f1 = 1, f2 = 1, fn;
+    for (int i = 3; i <= n; ++i) {
+        fn = (f1 + f2) % MOD;
+        f1 = f2;
+        f2 = fn;
+    }
+
+    cout << fn << endl;
+    return 0;
+}

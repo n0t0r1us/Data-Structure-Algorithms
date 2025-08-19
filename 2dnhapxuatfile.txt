@@ -1,0 +1,30 @@
+#include <iostream>
+#include <fstream>
+
+using namespace std;
+
+int main() {
+    ifstream inputFile("input.txt");
+    ofstream outputFile("output.txt");
+
+    int n;
+    inputFile >> n;
+
+    int matrix[n][n];
+    for (int i = 0; i < n; ++i) {
+        for (int j = 0; j < n; ++j) {
+            inputFile >> matrix[i][j];
+        }
+    }
+    int sumMainDiagonal = 0;
+    int sumSecondaryDiagonal = 0;
+    for (int i = 0; i < n; ++i) {
+        sumMainDiagonal += matrix[i][i];
+        sumSecondaryDiagonal += matrix[i][n - 1 - i];
+    }
+    outputFile << sumMainDiagonal << " " << sumSecondaryDiagonal;
+    inputFile.close();
+    outputFile.close();
+
+    return 0;
+}

@@ -1,0 +1,39 @@
+#include <bits/stdc++.h>
+using namespace std;
+
+int main() {
+    ios::sync_with_stdio(false);
+    cin.tie(NULL);
+    int n;
+    cin >> n;
+    vector<string> board(n);
+    for (int i = 0; i < n; i++) cin >> board[i];
+
+    int dx[4] = {0, 1, 1, 1};
+    int dy[4] = {1, 0, 1, -1};
+
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < n; j++) {
+            char c = board[i][j];
+            if (c == '.') continue;
+            for (int dir = 0; dir < 4; dir++) {
+                int cnt = 0;
+                int x = i, y = j;
+                while (x >= 0 && x < n && y >= 0 && y < n && board[x][y] == c) {
+                    cnt++;
+                    x += dx[dir];
+                    y += dy[dir];
+                }
+                if (cnt >= 5) {
+                    if (c == 'x') {
+                        cout << "Ti wins\n";
+                    } else {
+                        cout << "Teo wins\n";
+                    }
+                    return 0;
+                }
+            }
+        }
+    }
+    cout << "Not yet\n";
+}

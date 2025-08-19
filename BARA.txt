@@ -1,0 +1,12 @@
+#include <iostream>
+using namespace std;
+
+int main() {
+    int n, k;
+    if (!(cin >> n >> k)) return 0;
+    int cap = (k < n) ? k : n; // mỗi lượt tối đa cap mặt (mỗi bánh tối đa 1 mặt/lượt)
+    int total_faces = 2 * n;
+    int rounds = (total_faces + cap - 1) / cap;
+    cout << rounds * 5 << endl;
+    return 0;
+}

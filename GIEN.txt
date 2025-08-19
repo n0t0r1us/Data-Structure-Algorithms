@@ -1,0 +1,35 @@
+#include <iostream>
+#include <set>
+#include <string>
+#include <vector>
+using namespace std;
+
+int n;
+string father, mother;
+set<string> result;
+
+void generate(int index, string current) {
+    if (index == n) {
+        result.insert(current);
+        return;
+    }
+
+    generate(index + 1, current + father[index]);
+    generate(index + 1, current + mother[index]);
+}
+
+int main() {
+    cin >> n;
+    cin >> father >> mother;
+
+    generate(0, "");
+
+    cout << result.size() << endl;
+    set<string>::iterator it;
+    for (it = result.begin(); it != result.end(); ++it) {
+        cout << *it << endl;
+    }
+
+    return 0;
+}
+    

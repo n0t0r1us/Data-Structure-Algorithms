@@ -1,0 +1,96 @@
+#include <iostream>
+#include <queue>
+#include <vector>
+#include <cstring>
+using namespace std;
+
+const int MAX = 1005;
+int N, M;
+int grid[MAX][MAX];
+int meltDay[MAX][MAX];
+bool visited[MAX][MAX];
+int u1, v1, u2, v2;
+int dx[4] = {1, -1, 0, 0};
+int dy[4] = {0, 0, 1, -1};
+
+// BFS để tính ngày băng tan
+void bfs_melt() {
+    memset(meltDay, -1, sizeof(meltDay));
+    queue<pair<int, int> > q;
+
+    for (int i = 0; i < N; ++i)
+        for (int j = 0; j < M; ++j)
+            if (grid[i][j] == 0) {
+                meltDay[i][j] = 0;
+                q.push(make_pair(i, j));
+            }
+
+    while (!q.empty()) {
+        pair<int, int> cur = q.front(); q.pop();
+        int x = cur.first, y = cur.second;
+
+        for (int dir = 0; dir < 4; ++dir) {
+            int nx = x + dx[dir];
+            int ny = y + dy[dir];
+            if (nx < 0 || nx >= N || ny < 0 || ny >= M) continue;
+            if (meltDay[nx][ny] == -1 && grid[nx][ny] == 1) {
+                meltDay[nx][ny] = meltDay[x][y] + 1;
+                q.push(make_pair(nx, ny));
+            }
+        }
+    }
+}
+
+// Kiểm tra sau 'day' ngày có thể đi được từ (u1,v1) đến (u2,v2) không
+bool canReach(int day) {
+    memset(visited, 0, sizeof(visited));
+    queue<pair<int, int> > q;
+    q.push(make_pair(u1, v1));
+    visited[u1][v1] = true;
+
+    while (!q.empty()) {
+        pair<int, int> cur = q.front(); q.pop();
+        int x = cur.first, y = cur.second;
+
+        if (x == u2 && y == v2) return true;
+
+        for (int dir = 0; dir < 4; ++dir) {
+            int nx = x + dx[dir];
+            int ny = y + dy[dir];
+            if (nx < 0 || nx >= N || ny < 0 || ny >= M) continue;
+            if (visited[nx][ny]) continue;
+            if (meltDay[nx][ny] <= day) {
+                visited[nx][ny] = true;
+                q.push(make_pair(nx, ny));
+            }
+        }
+    }
+
+    return false;
+}
+
+int main() {
+    cin >> N >> M;
+    for (int i = 0; i < N; ++i)
+        for (int j = 0; j < M; ++j)
+            cin >> grid[i][j];
+
+    cin >> u1 >> v1 >> u2 >> v2;
+    u1--; v1--; u2--; v2--;  // đổi về chỉ số từ 0
+
+    bfs_melt();
+
+    int left = 0, right = 2000, res = -1;
+    while (left <= right) {
+        int mid = (left + right) / 2;
+        if (canReach(mid)) {
+            res = mid;
+            right = mid - 1;
+        } else {
+            left = mid + 1;
+        }
+    }
+
+    cout << res << endl;
+    return 0;
+}

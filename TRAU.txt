@@ -1,0 +1,23 @@
+#include <iostream>
+using namespace std;
+
+int main() {
+    int n, m;
+    cin >> n >> m;
+
+    // a: trâu đứng (ăn 5 bó), b: trâu nằm (ăn 3 bó), c: trâu già (3 con ăn 1 bó => mỗi con ăn 1/3 bó)
+    for (int a = 1; a <= n - 2; ++a) {       // cần ít nhất 1 con mỗi loại
+        for (int b = 1; b <= n - a - 1; ++b) {
+            int c = n - a - b;
+            if (c < 1) continue;
+            int total_grass = 5 * a + 3 * b + c / 3;
+            if (c % 3 == 0 && total_grass == m) {
+                cout << a << " " << b << " " << c << endl;
+                return 0;
+            }
+        }
+    }
+
+    cout << -1 << endl;
+    return 0;
+}

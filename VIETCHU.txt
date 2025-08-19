@@ -1,0 +1,67 @@
+#include <bits/stdc++.h>
+using namespace std;
+
+string dv[] = {"khong","mot","hai","ba","bon","nam","sau","bay","tam","chin"};
+
+void readTwo(int n, bool isFull, vector<string> &res) {
+    if (n == 0) return;
+    int tens = n / 10;
+    int unit = n % 10;
+    if (tens == 0) {
+        if (isFull) res.push_back("le");
+        if (unit == 5 && isFull) res.push_back("nam");
+        else res.push_back(dv[unit]);
+    } else if (tens == 1) {
+        res.push_back("muoi");
+        if (unit == 0) return;
+        if (unit == 5) res.push_back("lam");
+        else res.push_back(dv[unit]);
+    } else { // tens >= 2
+        res.push_back(dv[tens]);
+        res.push_back("muoi");
+        if (unit == 0) return;
+        if (unit == 1) res.push_back("mot");
+        else if (unit == 5) res.push_back("lam");
+        else res.push_back(dv[unit]);
+    }
+}
+
+void readThree(int n, bool isFull, vector<string> &res) {
+    if (n == 0) return;
+    int h = n / 100;
+    int rest = n % 100;
+    if (h > 0) {
+        res.push_back(dv[h]);
+        res.push_back("tram");
+    } else if (isFull) {
+        res.push_back("khong");
+        res.push_back("tram");
+    }
+    if (rest > 0) readTwo(rest, (h > 0 || isFull), res);
+}
+
+int main() {
+    ios::sync_with_stdio(false);
+    cin.tie(NULL);
+
+    int N;
+    if (!(cin >> N)) return 0;
+    if (N == 0) {
+        cout << "khong\n";
+        return 0;
+    }
+    int nghin = N / 1000;
+    int du = N % 1000;
+    vector<string> out;
+    if (nghin > 0) {
+        readThree(nghin, false, out);
+        out.push_back("nghin");
+    }
+    readThree(du, nghin > 0, out);
+    for (size_t i = 0; i < out.size(); ++i) {
+        if (i) cout << " ";
+        cout << out[i];
+    }
+    cout << "\n";
+    return 0;
+}

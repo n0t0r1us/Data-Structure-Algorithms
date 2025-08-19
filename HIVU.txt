@@ -1,0 +1,33 @@
+#include <iostream>
+#include <algorithm>
+using namespace std;
+typedef long long ll;
+
+int main() {
+    ios::sync_with_stdio(false);
+    cin.tie(0);
+    ll x[4], y[4];
+    for (int i = 0; i < 4; ++i) {
+        if (!(cin >> x[i] >> y[i])) return 0;
+    }
+    ll d2[6];
+    int idx = 0;
+    for (int i = 0; i < 4; ++i) {
+        for (int j = i+1; j < 4; ++j) {
+            ll dx = x[i] - x[j];
+            ll dy = y[i] - y[j];
+            d2[idx++] = dx*dx + dy*dy;
+        }
+    }
+    sort(d2, d2+6);
+    // điều kiện: 4 giá trị nhỏ nhất bằng nhau và > 0, 2 giá trị lớn nhất bằng nhau
+    // và d2[4] == 2 * d2[0]
+    bool ok = true;
+    if (d2[0] == 0) ok = false; // có hai điểm trùng nhau (theo đề không có, nhưng an toàn)
+    for (int i = 1; i < 4 && ok; ++i) if (d2[i] != d2[0]) ok = false;
+    if (d2[4] != d2[5]) ok = false;
+    if (ok && d2[4] != 2 * d2[0]) ok = false;
+
+    cout << (ok ? "YES" : "NO") << "\n";
+    return 0;
+}

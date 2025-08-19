@@ -1,0 +1,19 @@
+#include <iostream>
+using namespace std;
+
+int main() {
+    long long n;
+    cin >> n;
+    const long long MOD = 1000000; // 6 chữ số cuối
+    long long res = 0;
+    long long i = 1;
+    while (i <= n) {
+        long long v = n / i;
+        long long end = n / v;
+        long long cnt = end - i + 1;
+        res = (res + (v % MOD) * (cnt % MOD)) % MOD;
+        i = end + 1;
+    }
+    cout << res % MOD << "\n";
+    return 0;
+}

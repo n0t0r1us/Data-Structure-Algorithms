@@ -1,0 +1,38 @@
+#include <bits/stdc++.h>
+using namespace std;
+
+int main() {
+    ios::sync_with_stdio(false);
+    cin.tie(NULL);
+    int n;
+    cin >> n;
+    vector<vector<int> > a(n, vector<int>(n));
+    int val = 1;
+    for (int s = 0; s <= 2*(n-1); s++) {
+        if (s % 2 == 0) {
+            // đi từ dưới lên
+            for (int i = min(s, n-1); i >= 0; i--) {
+                int j = s - i;
+                if (j >= 0 && j < n) {
+                    a[i][j] = val++;
+                }
+            }
+        } else {
+            // đi từ trên xuống
+            for (int i = 0; i <= min(s, n-1); i++) {
+                int j = s - i;
+                if (j >= 0 && j < n) {
+                    a[i][j] = val++;
+                }
+            }
+        }
+    }
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < n; j++) {
+            cout << a[i][j];
+            if (j < n-1) cout << " ";
+        }
+        cout << "\n";
+    }
+    return 0;
+}

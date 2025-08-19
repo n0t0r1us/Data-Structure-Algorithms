@@ -1,0 +1,24 @@
+#include <iostream>
+using namespace std;
+
+int n, k;
+int a[20];
+
+void in() {
+    for (int i = 1; i <= k; i++) cout << a[i] << " ";
+    cout << endl;
+}
+
+void Try(int i, int start) {
+    for (int j = start; j <= n - k + i; j++) {
+        a[i] = j;
+        if (i == k) in();
+        else Try(i + 1, j + 1);
+    }
+}
+
+int main() {
+    cin >> n >> k;
+    Try(1, 1);
+    return 0;
+}

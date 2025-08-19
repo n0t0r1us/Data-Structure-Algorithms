@@ -1,0 +1,71 @@
+#include <iostream>
+#include <string>
+#include <vector>
+#include <cstring>
+using namespace std;
+
+const int MOD = 1000000009;
+int dp_true[305][305];
+int dp_false[305][305];
+string S, T;
+
+void solve_dp(int n) {
+    memset(dp_true, 0, sizeof(dp_true));
+    memset(dp_false, 0, sizeof(dp_false));
+
+    // Cơ sở: các biểu thức chỉ gồm 1 số
+    for (int i = 0; i < n; ++i) {
+        if (S[i] == '1') dp_true[i][i] = 1;
+        else dp_false[i][i] = 1;
+    }
+
+    // Duyệt độ dài đoạn
+    for (int len = 2; len <= n; ++len) {
+        for (int i = 0; i + len - 1 < n; ++i) {
+            int j = i + len - 1;
+            for (int k = i; k < j; ++k) {
+                char op = T[k]; // phép toán giữa S[k] và S[k+1]
+                int lt = dp_true[i][k];
+                int lf = dp_false[i][k];
+                int rt = dp_true[k+1][j];
+                int rf = dp_false[k+1][j];
+
+                if (op == 'a') { // AND
+                    dp_true[i][j] = (dp_true[i][j] + 1LL * lt * rt % MOD) % MOD;
+                    dp_false[i][j] = (dp_false[i][j] + 1LL * lt * rf % MOD + 1LL * lf * rt % MOD + 1LL * lf * rf % MOD) % MOD;
+                }
+                else if (op == 'o') { // OR
+                    dp_true[i][j] = (dp_true[i][j] + 1LL * lt * rt % MOD + 1LL * lt * rf % MOD + 1LL * lf * rt % MOD) % MOD;
+                    dp_false[i][j] = (dp_false[i][j] + 1LL * lf * rf % MOD) % MOD;
+                }
+                else if (op == 'x') { // XOR
+                    dp_true[i][j] = (dp_true[i][j] + 1LL * lt * rf % MOD + 1LL * lf * rt % MOD) % MOD;
+                    dp_false[i][j] = (dp_false[i][j] + 1LL * lt * rt % MOD + 1LL * lf * rf % MOD) % MOD;
+                }
+            }
+        }
+    }
+}
+
+int main() {
+    ios::sync_with_stdio(false);
+    cin.tie(0);
+
+    cin >> S >> T;
+    int n = S.length();
+    solve_dp(n);
+
+    int q;
+    cin >> q;
+    while (q--) {
+        int l, r;
+        string res;
+        cin >> l >> r >> res;
+        --l; --r;
+        if (res == "true")
+            cout << dp_true[l][r] << "\n";
+        else
+            cout << dp_false[l][r] << "\n";
+    }
+    return 0;
+}

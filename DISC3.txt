@@ -1,0 +1,64 @@
+#include <iostream>
+#include <vector>
+using namespace std;
+typedef long long ll;
+
+struct Fenwick {
+    int n;
+    vector<int> bit;
+    Fenwick(int n_=0) { init(n_); }
+    void init(int n_) {
+        n = n_;
+        bit.assign(n+1, 0);
+    }
+    void add(int idx, int val) {
+        for (; idx <= n; idx += idx & -idx) bit[idx] += val;
+    }
+    int sum(int idx) {
+        int r = 0;
+        for (; idx > 0; idx -= idx & -idx) r += bit[idx];
+        return r;
+    }
+};
+
+int main() {
+    ios::sync_with_stdio(false);
+    cin.tie(0);
+
+    int n, m;
+    if (!(cin >> n >> m)) return 0;
+    vector<int> queries(m);
+    for (int i = 0; i < m; ++i) cin >> queries[i];
+
+    int size = n + m + 5;
+    Fenwick fw(size);
+
+    vector<int> pos(n + 1, 0);
+    // ban đầu đặt đĩa i ở vị trí m + i (1-based)
+    for (int i = 1; i <= n; ++i) {
+        pos[i] = m + i;
+        fw.add(pos[i], 1);
+    }
+
+    int cur = m; // vị trí tiếp theo cho đĩa lên trên cùng
+    vector<int> ans;
+    ans.reserve(m);
+    for (int i = 0; i < m; ++i) {
+        int x = queries[i];
+        int above = fw.sum(pos[x] - 1); // số đĩa nằm phía trên đĩa x
+        ans.push_back(above);
+        // di chuyển đĩa x lên trên cùng
+        fw.add(pos[x], -1);
+        pos[x] = cur;
+        fw.add(pos[x], 1);
+        --cur;
+    }
+
+    // in kết quả
+    for (size_t i = 0; i < ans.size(); ++i) {
+        if (i) cout << ' ';
+        cout << ans[i];
+    }
+    cout << '\n';
+    return 0;
+}

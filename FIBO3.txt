@@ -1,0 +1,36 @@
+#include <iostream>
+using namespace std;
+typedef long long ll;
+const ll MOD = 1000007LL; // 10^6 + 7
+
+// fast doubling: trả về (F_n, F_{n+1}) mod MOD
+pair<ll,ll> fib_pair(long long n) {
+    if (n == 0) return make_pair(0LL, 1LL);
+    pair<ll,ll> p = fib_pair(n >> 1);
+    ll a = p.first;   // F_k
+    ll b = p.second;  // F_{k+1}
+    // c = F_{2k} = F_k * (2*F_{k+1} - F_k)
+    ll two_b_minus_a = (2LL * b - a) % MOD;
+    if (two_b_minus_a < 0) two_b_minus_a += MOD;
+    ll c = (a * two_b_minus_a) % MOD;
+    // d = F_{2k+1} = F_k^2 + F_{k+1}^2
+    ll d = ( (a * a) % MOD + (b * b) % MOD ) % MOD;
+    if ((n & 1LL) == 0) {
+        return make_pair(c, d);
+    } else {
+        return make_pair(d, (c + d) % MOD);
+    }
+}
+
+int main() {
+    ios::sync_with_stdio(false);
+    cin.tie(0);
+
+    long long n;
+    if (!(cin >> n)) return 0;
+    pair<ll,ll> res = fib_pair(n);
+    ll Fn = res.first % MOD;
+    if (Fn < 0) Fn += MOD;
+    cout << Fn << "\n";
+    return 0;
+}

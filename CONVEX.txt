@@ -1,0 +1,39 @@
+#include <bits/stdc++.h>
+using namespace std;
+int n,m,grid[55][55];
+vector<pair<int,int> > black;
+bool straight_black(int r1,int c1,int r2,int c2){
+    if(r1==r2){
+        for(int c=min(c1,c2);c<=max(c1,c2);c++)
+            if(grid[r1][c]==0) return false;
+        return true;
+    }
+    if(c1==c2){
+        for(int r=min(r1,r2);r<=max(r1,r2);r++)
+            if(grid[r][c1]==0) return false;
+        return true;
+    }
+    return false;
+}
+int main(){
+    ios::sync_with_stdio(false);
+    cin.tie(NULL);
+    cin>>n>>m;
+    for(int i=0;i<n;i++)
+        for(int j=0;j<m;j++){
+            cin>>grid[i][j];
+            if(grid[i][j]==1) black.push_back(make_pair(i,j));
+        }
+    for(size_t i=0;i<black.size();i++){
+        for(size_t j=i+1;j<black.size();j++){
+            int r1=black[i].first,c1=black[i].second;
+            int r2=black[j].first,c2=black[j].second;
+            bool ok=false;
+            if(straight_black(r1,c1,r1,c2) && straight_black(r1,c2,r2,c2)) ok=true;
+            if(straight_black(r1,c1,r2,c1) && straight_black(r2,c1,r2,c2)) ok=true;
+            if(!ok){cout<<"NO\n";return 0;}
+        }
+    }
+    cout<<"YES\n";
+    return 0;
+}

@@ -1,0 +1,62 @@
+#include <iostream>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+
+int main() {
+    ios::sync_with_stdio(false);
+    cin.tie(0);
+
+    int n;
+    if (!(cin >> n)) return 0;
+    vector<int> t(n);
+    long long total = 0;
+    for (int i = 0; i < n; ++i) {
+        cin >> t[i];
+        total += t[i];
+    }
+
+    if (total % 2 != 0) {
+        cout << "khong chia duoc\n";
+        return 0;
+    }
+    long long target = total / 2;
+
+    vector<string> solutions;
+    int maxmask = 1 << n;
+    for (int mask = 0; mask < maxmask; ++mask) {
+        long long s = 0;
+        // compute sum of elements included in mask
+        for (int i = 0; i < n; ++i) if (mask & (1<<i)) s += t[i];
+        if (s == target) {
+            // build string without spaces for sorting: 'A' for included, 'B' for excluded
+            string str;
+            str.reserve(n);
+            for (int i = 0; i < n; ++i) {
+                if (mask & (1<<i)) str.push_back('A');
+                else str.push_back('B');
+            }
+            solutions.push_back(str);
+        }
+    }
+
+    if (solutions.empty()) {
+        cout << "khong chia duoc\n";
+        return 0;
+    }
+
+    // sort lexicographically so that sequences beginning with 'A' come before those with 'B'
+    sort(solutions.begin(), solutions.end());
+
+    cout << (int)solutions.size() << "\n";
+    for (size_t k = 0; k < solutions.size(); ++k) {
+        const string &str = solutions[k];
+        for (int i = 0; i < n; ++i) {
+            if (i) cout << ' ';
+            cout << str[i];
+        }
+        cout << "\n";
+    }
+    return 0;
+}

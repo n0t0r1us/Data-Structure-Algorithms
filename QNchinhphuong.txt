@@ -1,0 +1,28 @@
+#include <iostream>
+using namespace std;
+
+int main() {
+    int n;
+    cin >> n;
+    const int MAXN = 10000; // vì n < 10^4
+    int a[MAXN];
+    
+    // Mảng đánh dấu các số đã có trong dãy
+    bool exist[100000] = {false}; // chỉ cần đánh dấu đến vài trăm nghìn
+
+    for (int i = 0; i < n; ++i) {
+        cin >> a[i];
+        if (a[i] < 100000)
+            exist[a[i]] = true;
+    }
+
+    for (int i = 0; ; ++i) {
+        int square = i * i;
+        if (square >= 100000 || !exist[square]) {
+            cout << square << endl;
+            break;
+        }
+    }
+
+    return 0;
+}

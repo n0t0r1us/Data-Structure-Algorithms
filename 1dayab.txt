@@ -1,0 +1,33 @@
+#include <iostream>
+#include <bitset>
+
+void generateSequences(int n, std::bitset<10>& current, int pos) {
+    if (pos == n) {
+        for (int i = 0; i < n; ++i) {
+            std::cout << (current[i] ? 'B' : 'A');
+        }
+        std::cout << std::endl;
+        return;
+    }
+    current[pos] = 0;
+    generateSequences(n, current, pos + 1);
+    if (pos == 0 || !current[pos - 1]) {
+        current[pos] = 1;
+        generateSequences(n, current, pos + 1);
+    }
+}
+
+int main() {
+    int n;
+    std::cin >> n;
+
+    if (n < 1 || n > 10) {
+        std::cout << "" << std::endl;
+        return 1;
+    }
+
+    std::bitset<10> current;
+    generateSequences(n, current, 0);
+
+    return 0;
+}

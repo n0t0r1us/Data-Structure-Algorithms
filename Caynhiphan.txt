@@ -1,0 +1,181 @@
+#include <iostream>
+#include <string>
+#include <stack>
+#include <sstream>
+#include <algorithm>
+using namespace std;
+
+struct TreeNode {
+    string info;
+    TreeNode* left;
+    TreeNode* right;
+};
+
+TreeNode* MakeNode(string val) {
+    TreeNode* node = new TreeNode;
+    node->info = val;
+    node->left = node->right = nullptr;
+    return node;
+}
+
+TreeNode* BuildSampleTree() {
+    TreeNode* A = MakeNode("A");
+    TreeNode* B = MakeNode("B");
+    TreeNode* C = MakeNode("C");
+    TreeNode* D = MakeNode("D");
+
+    A->left = B;
+    A->right = C;
+    C->right = D;
+
+    return A;
+}
+
+void PrintCustom(TreeNode* root) {
+    if (!root) return;
+    cout << root->info << " ";
+    if (root->left) cout << root->left->info << " ";
+    if (root->right) cout << root->right->info << " ";
+    if (root->right && root->right->right) cout << root->right->right->info << " ";
+    cout << endl;
+}
+
+void DeleteTree(TreeNode* root) {
+    if (!root) return;
+    DeleteTree(root->left);
+    DeleteTree(root->right);
+    delete root;
+}
+
+void InOrder(TreeNode* root) {
+    if (!root) return;
+    InOrder(root->left);
+    cout << root->info << " ";
+    InOrder(root->right);
+}
+
+void PostOrder(TreeNode* root) {
+    if (!root) return;
+    PostOrder(root->left);
+    PostOrder(root->right);
+    cout << root->info << " ";
+}
+
+int CountNodes(TreeNode* root) {
+    if (!root) return 0;
+    return 1 + CountNodes(root->left) + CountNodes(root->right);
+}
+
+int CountLeaves(TreeNode* root) {
+    if (!root) return 0;
+    if (!root->left && !root->right) return 1;
+    return CountLeaves(root->left) + CountLeaves(root->right);
+}
+
+int TreeHeight(TreeNode* root) {
+    if (!root) return 0;
+    return 1 + max(TreeHeight(root->left), TreeHeight(root->right));
+}
+
+bool isOperator(string s) {
+    return s == "+" || s == "-" || s == "*" || s == "/";
+}
+
+TreeNode* ExpressionTreeFromPostfix(string postfix) {
+    stack<TreeNode*> stk;
+    stringstream ss(postfix);
+    string token;
+    while (ss >> token) {
+        TreeNode* node = MakeNode(token);
+        if (isOperator(token)) {
+            node->right = stk.top(); stk.pop();
+            node->left = stk.top(); stk.pop();
+        }
+        stk.push(node);
+    }
+    return stk.top();
+}
+
+void MirrorTree(TreeNode* root) {
+    if (!root) return;
+    swap(root->left, root->right);
+    MirrorTree(root->left);
+    MirrorTree(root->right);
+}
+
+void InOrderExpression(TreeNode* root) {
+    if (!root) return;
+    if (root->left || root->right) cout << "(";
+    InOrderExpression(root->left);
+    cout << root->info;
+    InOrderExpression(root->right);
+    if (root->left || root->right) cout << ")";
+}
+
+bool IsIsomorphic(TreeNode* a, TreeNode* b) {
+    if (!a && !b) return true;
+    if (!a || !b) return false;
+    return IsIsomorphic(a->left, b->left) && IsIsomorphic(a->right, b->right);
+}
+
+void heapify(int a[], int n, int i) {
+    int largest = i;
+    int l = 2*i + 1;
+    int r = 2*i + 2;
+    if (l < n && a[l] > a[largest]) largest = l;
+    if (r < n && a[r] > a[largest]) largest = r;
+    if (largest != i) {
+        swap(a[i], a[largest]);
+        heapify(a, n, largest);
+    }
+}
+
+void HeapSort(int a[], int n) {
+    for (int i = n/2 - 1; i >= 0; i--) heapify(a, n, i);
+    for (int i = n - 1; i > 0; i--) {
+        swap(a[0], a[i]);
+        heapify(a, i, 0);
+    }
+}
+
+int main() {
+    cout << "Xay dung va duyet cay A-B-C-D:\n";
+    TreeNode* root = BuildSampleTree();
+    PrintCustom(root);
+
+    cout << "\nDuyet trung thu tu: ";
+    InOrder(root);
+    cout << "\nDuyet hau thu tu: ";
+    PostOrder(root);
+
+    cout << "\nSo nut: " << CountNodes(root);
+    cout << "\nSo nut la: " << CountLeaves(root);
+    cout << "\nChieu cao: " << TreeHeight(root) << endl;
+
+    DeleteTree(root);
+
+    cout << "\nNhap bieu thuc hau to: ";
+    string expr;
+    getline(cin, expr);
+    TreeNode* exprTree = ExpressionTreeFromPostfix(expr);
+
+    cout << "\nTrung to cua cay bieu thuc: ";
+    InOrderExpression(exprTree);
+    cout << endl;
+
+    cout << "Dao cay bieu thuc va in trung to: ";
+    MirrorTree(exprTree);
+    InOrderExpression(exprTree);
+    cout << endl;
+
+    DeleteTree(exprTree);
+
+    int arr[] = {4, 10, 3, 5, 1};
+    int n = 5;
+    HeapSort(arr, n);
+    cout << "\nDay sau khi sap xep HeapSort: ";
+    for (int i = 0; i < n; i++) cout << arr[i] << " ";
+    cout << endl;
+
+    return 0;
+}

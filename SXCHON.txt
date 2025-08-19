@@ -1,0 +1,38 @@
+#include <iostream>
+using namespace std;
+
+int main() {
+    int n;
+    cin >> n;
+    int a[25];
+    for (int i = 0; i < n; i++) cin >> a[i];
+
+    for (int i = 0; i < n - 1; i++) {
+        int min_idx = i;
+        for (int j = i + 1; j < n; j++) {
+            if (a[j] < a[min_idx]) {
+                min_idx = j;
+            }
+        }
+
+        bool swapped = (min_idx != i);
+        int pos1 = i, pos2 = min_idx;
+
+        if (swapped) swap(a[pos1], a[pos2]);
+
+        for (int k = 0; k < n; k++) {
+            if (!swapped && k == pos1) {
+                cout << "[" << a[k] << "]";
+            } else if (swapped && (k == pos1 || k == pos2)) {
+                cout << "[" << a[k] << "]";
+            } else {
+                cout << a[k];
+            }
+
+            if (k < n - 1) cout << " ";
+        }
+        cout << endl;
+    }
+
+    return 0;
+}

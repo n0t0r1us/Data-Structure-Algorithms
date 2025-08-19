@@ -1,0 +1,71 @@
+#include <iostream>
+#include <vector>
+#include <queue>
+#include <climits>
+#include <utility>
+using namespace std;
+
+#define MAX 705
+#define pii pair<int, pair<int, int> >
+
+int n, m;
+int a[MAX][MAX]; // ngang: [i][j] là thời gian từ (i,j) sang (i,j+1)
+int b[MAX][MAX]; // dọc: [i][j] là thời gian từ (i,j) sang (i+1,j)
+int dist[MAX][MAX];
+
+int dx[] = {0, 1, 0, -1}; // phải, xuống, trái, lên
+int dy[] = {1, 0, -1, 0};
+
+int main() {
+    cin >> n >> m;
+    
+    // Nhập a[i][j]
+    for (int i = 1; i <= n; ++i)
+        for (int j = 1; j < m; ++j)
+            cin >> a[i][j];
+    
+    // Nhập b[i][j]
+    for (int i = 1; i < n; ++i)
+        for (int j = 1; j <= m; ++j)
+            cin >> b[i][j];
+    
+    // Khởi tạo dist
+    for (int i = 1; i <= n; ++i)
+        for (int j = 1; j <= m; ++j)
+            dist[i][j] = INT_MAX;
+    
+    // Dijkstra
+    priority_queue< pii, vector<pii>, greater<pii> > pq;
+    dist[1][1] = 0;
+    pq.push(make_pair(0, make_pair(1, 1)));
+    
+    while (!pq.empty()) {
+        pii top = pq.top(); pq.pop();
+        int cost = top.first;
+        int x = top.second.first;
+        int y = top.second.second;
+
+        if (cost > dist[x][y]) continue;
+
+        // 4 hướng
+        for (int dir = 0; dir < 4; ++dir) {
+            int nx = x + dx[dir];
+            int ny = y + dy[dir];
+            if (nx < 1 || ny < 1 || nx > n || ny > m) continue;
+
+            int w = 0;
+            if (dir == 0 && y < m) w = a[x][y]; // phải
+            if (dir == 1 && x < n) w = b[x][y]; // xuống
+            if (dir == 2 && y > 1) w = a[x][y - 1]; // trái
+            if (dir == 3 && x > 1) w = b[x - 1][y]; // lên
+
+            if (dist[nx][ny] > dist[x][y] + w) {
+                dist[nx][ny] = dist[x][y] + w;
+                pq.push(make_pair(dist[nx][ny], make_pair(nx, ny)));
+            }
+        }
+    }
+
+    cout << dist[n][m] << endl;
+    return 0;
+}

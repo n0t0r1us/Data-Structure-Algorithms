@@ -1,0 +1,73 @@
+#include <iostream>
+#include <vector>
+#include <map>
+#include <algorithm>
+
+using namespace std;
+
+typedef long long ll;
+
+int main() {
+    int N;
+    ll S, P;
+    cin >> N >> S >> P;
+
+    vector<ll> A(N);
+    for (int i = 0; i < N; ++i)
+        cin >> A[i];
+
+    int n1 = N / 2;
+    int n2 = N - n1;
+
+    vector< pair<ll, int> > left, right;
+
+    // Sinh tất cả tập con nửa đầu
+    for (int mask = 0; mask < (1 << n1); ++mask) {
+        ll sum = 0;
+        int cnt = 0;
+        for (int i = 0; i < n1; ++i)
+            if (mask & (1 << i)) {
+                sum += A[i];
+                ++cnt;
+            }
+        left.push_back(make_pair(sum, cnt));
+    }
+
+    // Sinh tất cả tập con nửa sau
+    for (int mask = 0; mask < (1 << n2); ++mask) {
+        ll sum = 0;
+        int cnt = 0;
+        for (int i = 0; i < n2; ++i)
+            if (mask & (1 << i)) {
+                sum += A[i + n1];
+                ++cnt;
+            }
+        right.push_back(make_pair(sum, cnt));
+    }
+
+    // Map lưu sum -> số hoa ít nhất để tạo ra sum (bên right)
+    map<ll, int> rightMap;
+    for (int i = 0; i < (int)right.size(); ++i) {
+        ll s = right[i].first;
+        int c = right[i].second;
+        if (rightMap.count(s))
+            rightMap[s] = min(rightMap[s], c);
+        else
+            rightMap[s] = c;
+    }
+
+    int res = -1;
+    for (int i = 0; i < (int)left.size(); ++i) {
+        ll need = S - left[i].first;
+        if (rightMap.count(need)) {
+            int totalCount = left[i].second + rightMap[need];
+            if (res == -1 || totalCount < res)
+                res = totalCount;
+        }
+    }
+
+    if (res == -1) cout << -1 << endl;
+    else cout << res * P << endl;
+
+    return 0;
+}

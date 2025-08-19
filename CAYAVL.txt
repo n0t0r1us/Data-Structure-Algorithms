@@ -1,0 +1,57 @@
+#include <iostream>
+#include <cmath>
+#include <algorithm> 
+using namespace std;
+
+struct Node {
+    int val;
+    Node* left;
+    Node* right;
+    Node(int v) {
+        val = v;
+        left = NULL;
+        right = NULL;
+    }
+};
+
+// Hàm chèn node vào cây nh? phân t?m ki?m
+Node* insert(Node* root, int val) {
+    if (root == NULL) return new Node(val);
+    if (val < root->val)
+        root->left = insert(root->left, val);
+    else
+        root->right = insert(root->right, val);
+    return root;
+}
+
+int checkAVL(Node* root) {
+    if (root == NULL) return 0;
+
+    int lh = checkAVL(root->left);
+    int rh = checkAVL(root->right);
+
+    if (lh == -1 || rh == -1) return -1; 
+    if (abs(lh - rh) > 1) return -1;    
+
+    return max(lh, rh) + 1; 
+}
+
+int main() {
+    int n;
+    cin >> n;
+    Node* root = NULL;
+
+    for (int i = 0; i < n; i++) {
+        int x;
+        cin >> x;
+        root = insert(root, x);
+    }
+
+    if (checkAVL(root) != -1)
+        cout << "YES" << endl;
+    else
+        cout << "NO" << endl;
+
+    return 0;
+}
+    

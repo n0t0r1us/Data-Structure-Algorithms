@@ -1,0 +1,38 @@
+#include <iostream>
+using namespace std;
+
+int main() {
+    int n, m;
+    cin >> n >> m;
+    int B[25], C[25];
+    for (int i = 0; i < n; i++)
+        cin >> B[i];
+    for (int i = 0; i < m; i++)
+        cin >> C[i];
+
+    int i = 0, j = 0;
+    while (i < n && j < m) {
+        if (B[i] < C[j]) {
+            cout << "b" << i + 1 << " ";
+            i++;
+        } else {
+            cout << "c" << j + 1 << " ";
+            j++;
+        }
+    }
+
+    // In phần còn lại của B nếu có
+    while (i < n) {
+        cout << "b" << i + 1 << " ";
+        i++;
+    }
+
+    // In phần còn lại của C nếu có
+    while (j < m) {
+        cout << "c" << j + 1 << " ";
+        j++;
+    }
+
+    return 0;
+}
+    

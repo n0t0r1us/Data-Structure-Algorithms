@@ -1,0 +1,59 @@
+#include <iostream>
+#include <stack>
+#include <string>
+#include <cstring>  // dùng strtok
+#include <cstdlib>  // dùng malloc nếu cần
+using namespace std;
+
+struct Node {
+    string val;
+    Node* trai;
+    Node* phai;
+};
+
+Node* taoNode(string v) {
+    Node* newNode = new Node;
+    newNode->val = v;
+    newNode->trai = NULL;
+    newNode->phai = NULL;
+    return newNode;
+}
+
+bool toanTu(string s) {
+    return s == "+" || s == "-" || s == "*" || s == "/" || s == "^";
+}
+
+int chieuCao(Node* root) {
+    if (root == NULL) return 0;
+    int caoTrai = chieuCao(root->trai);
+    int caoPhai = chieuCao(root->phai);
+    return 1 + (caoTrai > caoPhai ? caoTrai : caoPhai);
+}
+
+int main() {
+    char line[200];
+    cin.getline(line, 200);
+
+    stack<Node*> st;
+    char* token = strtok(line, " ");
+
+    while (token != NULL) {
+        string s(token);
+        if (!toanTu(s)) {
+            st.push(taoNode(s));
+        } else {
+            Node* phai = st.top(); st.pop();
+            Node* trai = st.top(); st.pop();
+            Node* opNode = taoNode(s);
+            opNode->trai = trai;
+            opNode->phai = phai;
+            st.push(opNode);
+        }
+        token = strtok(NULL, " ");
+    }
+
+    Node* root = st.top();
+    cout << chieuCao(root) << endl;
+
+    return 0;
+}

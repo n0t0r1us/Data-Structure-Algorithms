@@ -1,0 +1,35 @@
+#include <iostream>
+#include <fstream>
+#include <cstdlib>
+#include <cmath>
+
+int main() {
+    std::ifstream inp("input.txt");
+    if (!inp.is_open()) {
+        std::cerr << "";
+        return 1;
+    }
+    std::ofstream out("output.txt");
+    if (!out.is_open()) {
+        std::cerr << "";
+        return 1;
+    }
+
+    int hs, sm, i = 0;
+    while (inp >> hs >> sm) {
+        if (hs > 0 && i != 0) out << "+";
+        if (hs < 0) out << "-";
+        
+        int z = std::abs(hs);
+        if (z != 1 || sm == 0) out << z;
+
+        if (sm == 1) out << "x";
+        if (sm > 1) out << "x^" << sm;
+
+        i++;
+    }
+    inp.close();
+    out.close();
+
+    return 0;
+}

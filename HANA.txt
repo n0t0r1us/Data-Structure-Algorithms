@@ -1,0 +1,94 @@
+#include <iostream>
+#include <vector>
+#include <queue>
+#include <cstring>
+using namespace std;
+
+struct State {
+    int i, j, m;
+    State() {}
+    State(int _i,int _j,int _m):i(_i),j(_j),m(_m){}
+};
+
+int main(){
+    ios::sync_with_stdio(false);
+    cin.tie(0);
+    int n, m;
+    if (!(cin >> n >> m)) return 0;
+    vector< vector<int> > a(n+1, vector<int>(m+1));
+    for (int i=1;i<=n;i++){
+        for (int j=1;j<=m;j++){
+            cin >> a[i][j];
+        }
+    }
+
+    // visited[i][j][mask]
+    static bool vis[21+5][21+5][8];
+    static int pi[21+5][21+5][8];
+    static int pj[21+5][21+5][8];
+    static int pmask[21+5][21+5][8];
+    memset(vis, 0, sizeof(vis));
+    for (int i=0;i<21+5;i++) for (int j=0;j<21+5;j++) for (int k=0;k<8;k++){
+        pi[i][j][k] = pj[i][j][k] = pmask[i][j][k] = -1;
+    }
+
+    // Start at (1,1), value 0 => mask 0
+    queue<State> q;
+    vis[1][1][0] = true;
+    pi[1][1][0] = pj[1][1][0] = pmask[1][1][0] = -1; // root
+    q.push(State(1,1,0));
+
+    int found_mask = -1;
+    while (!q.empty()){
+        State s = q.front(); q.pop();
+        int i = s.i, j = s.j, mask = s.m;
+        // If reach end and collected at least 2 types:
+        int bits = ( (mask&1) ?1:0) + ( (mask&2)?1:0) + ( (mask&4)?1:0 );
+        if (i==n && j==m && bits >= 2) { found_mask = mask; break; }
+
+        // move right
+        int ni = i, nj = j+1;
+        if (nj <= m && a[ni][nj] != -1) {
+            int nmask = mask;
+            if (a[ni][nj] >= 1 && a[ni][nj] <= 3) nmask |= (1 << (a[ni][nj]-1));
+            if (!vis[ni][nj][nmask]) {
+                vis[ni][nj][nmask] = true;
+                pi[ni][nj][nmask] = i; pj[ni][nj][nmask] = j; pmask[ni][nj][nmask] = mask;
+                q.push(State(ni,nj,nmask));
+            }
+        }
+        // move down
+        ni = i+1; nj = j;
+        if (ni <= n && a[ni][nj] != -1) {
+            int nmask = mask;
+            if (a[ni][nj] >= 1 && a[ni][nj] <= 3) nmask |= (1 << (a[ni][nj]-1));
+            if (!vis[ni][nj][nmask]) {
+                vis[ni][nj][nmask] = true;
+                pi[ni][nj][nmask] = i; pj[ni][nj][nmask] = j; pmask[ni][nj][nmask] = mask;
+                q.push(State(ni,nj,nmask));
+            }
+        }
+    }
+
+    if (found_mask == -1) {
+        cout << -1 << '\n';
+        return 0;
+    }
+
+    // reconstruct path from (n,m,found_mask) back to (1,1,0)
+    vector< pair<int,int> > path;
+    int ci = n, cj = m, cm = found_mask;
+    while (!(ci==1 && cj==1 && cm==0)) {
+        path.push_back(make_pair(ci,cj));
+        int ti = pi[ci][cj][cm];
+        int tj = pj[ci][cj][cm];
+        int tm = pmask[ci][cj][cm];
+        ci = ti; cj = tj; cm = tm;
+    }
+    path.push_back(make_pair(1,1));
+    // path vector is reversed (end -> start), output reversed
+    for (int k = (int)path.size()-1; k >= 0; --k) {
+        cout << path[k].first << " " << path[k].second << '\n';
+    }
+    return 0;
+}

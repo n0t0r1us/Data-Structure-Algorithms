@@ -1,0 +1,28 @@
+#include <iostream>
+#include <vector>
+
+void primeFactorization(int n) {
+    std::vector<int> factors;
+    
+    for (int i = 2; i <= n; i++) {
+        while (n % i == 0) {
+            factors.push_back(i);
+            n /= i;
+        }
+    }
+    for (int i = factors.size() - 1; i >= 0; i--) {
+        std::cout << factors[i];
+        if (i != 0) {
+            std::cout << "*";
+        }
+    }
+}
+
+int main() {
+    int n;
+    std::cin >> n;
+
+    primeFactorization(n);
+
+    return 0;
+}

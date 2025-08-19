@@ -1,0 +1,28 @@
+#include <iostream>
+#include <vector>
+#include <algorithm>
+#include <cmath>
+using namespace std;
+
+typedef long long ll;
+const int MAXN = 100005;
+
+int B[MAXN];
+ll low[MAXN], high[MAXN];
+
+int main() {
+    int N;
+    cin >> N;
+    for (int i = 1; i <= N; ++i)
+        cin >> B[i];
+
+    low[1] = high[1] = 0;
+
+    for (int i = 2; i <= N; ++i) {
+        low[i] = max(low[i-1], high[i-1] + abs(B[i-1] - 1));
+        high[i] = max(low[i-1] + abs(B[i] - 1), high[i-1] + abs(B[i] - B[i-1]));
+    }
+
+    cout << max(low[N], high[N]) << endl;
+    return 0;
+}

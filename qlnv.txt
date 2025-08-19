@@ -1,0 +1,79 @@
+#include <iostream>
+#include <cstring>
+using namespace std;
+
+struct NhanVien {
+    char ma[9];
+    char ten[21];
+    int luong;
+};
+
+void nhapNV(NhanVien &nv) {
+    cin >> nv.ma;
+    cin.ignore();
+    cin.getline(nv.ten, 21);
+    cin >> nv.luong;
+}
+
+void xuatNV(NhanVien nv) {
+    cout << nv.ma << " " << nv.ten << " " << nv.luong << endl;
+}
+
+void sapXepGiamLuong(NhanVien a[], int n) {
+    for (int i = 0; i < n-1; ++i)
+        for (int j = i+1; j < n; ++j)
+            if (a[i].luong < a[j].luong)
+                swap(a[i], a[j]);
+}
+
+int timTheoMa(NhanVien a[], int n, const char maCanTim[]) {
+    for (int i = 0; i < n; ++i)
+        if (strcmp(a[i].ma, maCanTim) == 0)
+            return i;
+    return -1;
+}
+
+void xoaNV(NhanVien a[], int &n, int vt) {
+    for (int i = vt; i < n - 1; ++i)
+        a[i] = a[i + 1];
+    --n;
+}
+
+int main() {
+    int n;
+    cin >> n;
+    NhanVien a[100];
+
+    for (int i = 0; i < n; ++i)
+        nhapNV(a[i]);
+
+    // In danh sách nhân viên
+    for (int i = 0; i < n; ++i)
+        xuatNV(a[i]);
+
+    // Sắp xếp giảm dần theo lương
+    sapXepGiamLuong(a, n);
+    for (int i = 0; i < n; ++i)
+        xuatNV(a[i]);
+
+    // Tính tổng lương
+    long long tong = 0;
+    for (int i = 0; i < n; ++i)
+        tong += a[i].luong;
+    cout << tong << endl;
+
+    // Tìm và xóa nhân viên theo mã
+    char maX[9];
+    cin >> maX;
+    int vt = timTheoMa(a, n, maX);
+    if (vt != -1) {
+        cout << a[vt].ten << " " << a[vt].luong << endl;
+        xoaNV(a, n, vt);
+    }
+
+    // In lại danh sách sau khi xóa
+    for (int i = 0; i < n; ++i)
+        xuatNV(a[i]);
+
+    return 0;
+}

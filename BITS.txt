@@ -1,0 +1,17 @@
+#include <bits/stdc++.h>
+using namespace std;
+
+int main() {
+    ios::sync_with_stdio(false);
+    cin.tie(NULL);
+    unsigned int a, b;
+    cin >> a >> b;
+    unsigned int x = a ^ b;
+    int cnt = 0;
+    while (x) {
+        cnt += (x & 1);
+        x >>= 1;
+    }
+    cout << cnt;
+    return 0;
+}

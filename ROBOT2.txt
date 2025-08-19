@@ -1,0 +1,82 @@
+#include <iostream>
+#include <vector>
+#include <algorithm>
+using namespace std;
+
+int main() {
+    ios::sync_with_stdio(false);
+    cin.tie(0);
+
+    int M, N;
+    cin >> M >> N;
+    vector< vector<int> > C(M+1, vector<int>(N+1,0));
+    for(int i=1;i<=M;i++)
+        for(int j=1;j<=N;j++)
+            cin >> C[i][j];
+
+    int MAXV = 2000;
+    vector<char> isprime(MAXV+1, 1);
+    isprime[0]=0; isprime[1]=0;
+    for(int p=2; p*p<=MAXV; p++) if(isprime[p])
+        for(int q=p*p; q<=MAXV; q+=p) isprime[q]=0;
+
+    // waysFromS[i][j] = số đường từ (1,1) tới (i,j)
+    vector< vector<long long> > waysFromS(M+1, vector<long long>(N+1, 0));
+    waysFromS[1][1] = 1;
+    for(int i=1;i<=M;i++){
+        for(int j=1;j<=N;j++){
+            if(i==1 && j==1) continue;
+            long long sum = 0;
+            if(i>1){
+                int diff = C[i][j] - C[i-1][j];
+                if(diff<0) diff = -diff;
+                if(isprime[diff]) sum += waysFromS[i-1][j];
+            }
+            if(j>1){
+                int diff = C[i][j] - C[i][j-1];
+                if(diff<0) diff = -diff;
+                if(isprime[diff]) sum += waysFromS[i][j-1];
+            }
+            waysFromS[i][j] = sum;
+        }
+    }
+
+    // waysToT[i][j] = số đường từ (i,j) tới (M,N)
+    vector< vector<long long> > waysToT(M+1, vector<long long>(N+1, 0));
+    waysToT[M][N] = 1;
+    for(int i=M; i>=1; i--){
+        for(int j=N; j>=1; j--){
+            if(i==M && j==N) continue;
+            long long sum = 0;
+            if(i<M){
+                int diff = C[i][j] - C[i+1][j];
+                if(diff<0) diff = -diff;
+                if(isprime[diff]) sum += waysToT[i+1][j];
+            }
+            if(j<N){
+                int diff = C[i][j] - C[i][j+1];
+                if(diff<0) diff = -diff;
+                if(isprime[diff]) sum += waysToT[i][j+1];
+            }
+            waysToT[i][j] = sum;
+        }
+    }
+
+    long long totalWays = waysFromS[M][N];
+    vector< pair<int,int> > specials;
+    for(int i=1;i<=M;i++){
+        for(int j=1;j<=N;j++){
+            if((i==1 && j==1) || (i==M && j==N)) continue;
+            if(waysFromS[i][j] > 0 && waysToT[i][j] > 0 &&
+               waysFromS[i][j] * waysToT[i][j] == totalWays){
+                specials.push_back(make_pair(i,j));
+            }
+        }
+    }
+
+    cout << specials.size() << "\n";
+    for(size_t k=0;k<specials.size();k++)
+        cout << specials[k].first << " " << specials[k].second << "\n";
+
+    return 0;
+}

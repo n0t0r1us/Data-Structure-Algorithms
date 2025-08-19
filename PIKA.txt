@@ -1,0 +1,87 @@
+#include <iostream>
+#include <vector>
+#include <deque>
+#include <cstring>
+using namespace std;
+
+const int INF = 1000000000;
+int dy[4] = {-1, 1, 0, 0}; // up, down, left, right
+int dx[4] = {0, 0, -1, 1};
+
+int n, m;
+int g[105][105];
+int y1_, x1_, y2_, x2_;
+
+struct Node {
+    int y, x, dir;
+};
+
+bool allowed(int y, int x) {
+    if (y < 1 || y > n || x < 1 || x > m) return false;
+    if (g[y][x] == 0) return true;
+    if ((y == y1_ && x == x1_) || (y == y2_ && x == x2_)) return true;
+    return false;
+}
+
+int dist[105][105][4];
+
+int main(){
+    ios::sync_with_stdio(false);
+    cin.tie(0);
+
+    cin >> n >> m;
+    for (int i = 1; i <= n; ++i)
+        for (int j = 1; j <= m; ++j)
+            cin >> g[i][j];
+
+    cin >> y1_ >> x1_ >> y2_ >> x2_;
+
+    if (y1_ == y2_ && x1_ == x2_) {
+        cout << 0 << "\n";
+        return 0;
+    }
+
+    for (int i = 1; i <= n; ++i)
+        for (int j = 1; j <= m; ++j)
+            for (int d = 0; d < 4; ++d)
+                dist[i][j][d] = INF;
+
+    deque<Node> dq;
+
+    // khởi tạo từ điểm bắt đầu
+    for (int d = 0; d < 4; ++d) {
+        int ny = y1_ + dy[d], nx = x1_ + dx[d];
+        if (!allowed(ny,nx)) continue;
+        if (dist[ny][nx][d] > 0) {
+            dist[ny][nx][d] = 0;
+            dq.push_front((Node){ny, nx, d});
+        }
+    }
+
+    while (!dq.empty()) {
+        Node curNode = dq.front();
+        dq.pop_front();
+        int y = curNode.y;
+        int x = curNode.x;
+        int dir = curNode.dir;
+        int cur = dist[y][x][dir];
+
+        for (int nd = 0; nd < 4; ++nd) {
+            int ny = y + dy[nd], nx = x + dx[nd];
+            if (!allowed(ny,nx)) continue;
+            int add = (nd == dir) ? 0 : 1;
+            if (dist[ny][nx][nd] > cur + add) {
+                dist[ny][nx][nd] = cur + add;
+                if (add == 0) dq.push_front((Node){ny, nx, nd});
+                else dq.push_back((Node){ny, nx, nd});
+            }
+        }
+    }
+
+    int ans = INF;
+    for (int d = 0; d < 4; ++d) ans = min(ans, dist[y2_][x2_][d]);
+    if (ans == INF) cout << -1 << "\n";
+    else cout << ans << "\n";
+
+    return 0;
+}

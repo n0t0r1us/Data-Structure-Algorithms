@@ -1,0 +1,29 @@
+#include <iostream>
+
+int modPow(int x, long long n, int mod) {
+    int result = 1;
+    x = x % mod;
+
+    while (n > 0) {
+        if (n % 2 == 1) {
+            result = (result * x) % mod;
+        }
+
+        n = n / 2;
+        x = (x * x) % mod;
+    }
+
+    return result;
+}
+
+int main() {
+    int x, mod = 10000;
+    long long n;
+    std::cin >> x >> n;
+
+    int result = modPow(x, n, mod);
+
+    std::cout << result << std::endl;
+
+    return 0;
+}

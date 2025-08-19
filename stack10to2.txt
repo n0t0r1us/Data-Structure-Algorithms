@@ -1,0 +1,29 @@
+#include <iostream>
+#include <stack>
+using namespace std;
+
+void DecToBin(int n) {
+    if (n == 0) {
+        cout << 0;
+        return;
+    }
+
+    stack<int> st;
+
+    while (n > 0) {
+        st.push(n % 2);
+        n /= 2;
+    }
+
+    while (!st.empty()) {
+        cout << st.top();
+        st.pop();
+    }
+}
+
+int main() {
+    int n;
+    cin >> n;
+    DecToBin(n);
+    return 0;
+}

@@ -1,0 +1,104 @@
+#include <iostream>
+#include <vector>
+#include <cstdio>
+#include <cstring>
+using namespace std;
+
+struct BigInt {
+    static const int base = 1000000000;
+    vector<int> a; // little-endian
+
+    BigInt(long long v = 0) { *this = v; }
+
+    BigInt& operator=(long long v) {
+        a.clear();
+        if (v == 0) return *this;
+        while (v > 0) {
+            a.push_back(v % base);
+            v /= base;
+        }
+        return *this;
+    }
+
+    bool isZero() const { return a.empty(); }
+
+    static BigInt add(const BigInt &x, const BigInt &y) {
+        BigInt res;
+        int carry = 0;
+        size_t n = max(x.a.size(), y.a.size());
+        res.a.resize(n);
+        for (size_t i = 0; i < n; i++) {
+            long long sum = carry;
+            if (i < x.a.size()) sum += x.a[i];
+            if (i < y.a.size()) sum += y.a[i];
+            res.a[i] = int(sum % base);
+            carry = int(sum / base);
+        }
+        if (carry) res.a.push_back(carry);
+        return res;
+    }
+
+    static BigInt mulInt(const BigInt &x, int m) {
+        if (x.isZero() || m == 0) return BigInt(0);
+        BigInt res;
+        long long carry = 0;
+        res.a.resize(x.a.size());
+        for (size_t i = 0; i < x.a.size(); i++) {
+            long long cur = carry + 1LL * x.a[i] * m;
+            res.a[i] = int(cur % base);
+            carry = cur / base;
+        }
+        while (carry) {
+            res.a.push_back(int(carry % base));
+            carry /= base;
+        }
+        return res;
+    }
+
+    void print() const {
+        if (a.empty()) { printf("0"); return; }
+        printf("%d", a.back());
+        for (int i = (int)a.size() - 2; i >= 0; i--)
+            printf("%09d", a[i]);
+    }
+};
+
+BigInt dp[105][105];
+
+int main() {
+    int N, M;
+    cin >> N >> M;
+
+    dp[0][0] = BigInt(1);
+    for (int n = 1; n <= N; n++) {
+        for (int k = 1; k <= n; k++) {
+            BigInt term1 = BigInt::mulInt(dp[n-1][k], k);
+            BigInt term2 = dp[n-1][k-1];
+            dp[n][k] = BigInt::add(term1, term2);
+        }
+    }
+
+    // X = S(N, M)
+    BigInt X = dp[N][M];
+    X.print();
+    printf("\n");
+
+    // Y = max_{1..N} S(N,k)
+    BigInt Y = dp[N][1];
+    for (int k = 2; k <= N; k++) {
+        // compare
+        if (dp[N][k].a.size() > Y.a.size()) Y = dp[N][k];
+        else if (dp[N][k].a.size() == Y.a.size()) {
+            bool bigger = false, smaller = false;
+            for (int i = (int)dp[N][k].a.size() - 1; i >= 0; i--) {
+                if (dp[N][k].a[i] > Y.a[i]) { bigger = true; break; }
+                else if (dp[N][k].a[i] < Y.a[i]) { smaller = true; break; }
+            }
+            if (bigger) Y = dp[N][k];
+        }
+    }
+    Y.print();
+    printf("\n");
+
+    return 0;
+}

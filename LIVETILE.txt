@@ -1,0 +1,94 @@
+#include <iostream>
+#include <vector>
+using namespace std;
+
+const int W = 6;
+
+int n, m;
+int L, M, S;
+vector< vector<char> > grid;
+
+bool place(int l, int m, int s) {
+    grid = vector< vector<char> >(n, vector<char>(W, '.'));
+
+    // Place L (2x4)
+    for (int i = 0; i < n-1 && l > 0; i++) {
+        for (int j = 0; j <= W-4 && l > 0; j++) {
+            bool ok = true;
+            for (int x = 0; x < 4; x++) {
+                if (grid[i][j+x] != '.' || grid[i+1][j+x] != '.') {
+                    ok = false;
+                    break;
+                }
+            }
+            if (ok) {
+                for (int x = 0; x < 4; x++) {
+                    grid[i][j+x] = 'L';
+                    grid[i+1][j+x] = 'L';
+                }
+                l--;
+            }
+        }
+    }
+    if (l != 0) return false;
+
+    // Place M (2x2)
+    for (int i = 0; i < n-1 && m > 0; i++) {
+        for (int j = 0; j <= W-2 && m > 0; j++) {
+            if (grid[i][j] == '.' && grid[i][j+1] == '.' &&
+                grid[i+1][j] == '.' && grid[i+1][j+1] == '.') {
+                grid[i][j] = 'M';
+                grid[i][j+1] = 'M';
+                grid[i+1][j] = 'M';
+                grid[i+1][j+1] = 'M';
+                m--;
+            }
+        }
+    }
+    if (m != 0) return false;
+
+    // Place S (1x1)
+    for (int i = 0; i < n && s > 0; i++) {
+        for (int j = 0; j < W && s > 0; j++) {
+            if (grid[i][j] == '.') {
+                grid[i][j] = 'S';
+                s--;
+            }
+        }
+    }
+    if (s != 0) return false;
+
+    return true;
+}
+
+int main() {
+    cin >> n >> m;
+    int total = n * 6;
+    bool ok = false;
+
+    for (int l = 0; l <= m && !ok; l++) {
+        for (int mm = 0; mm <= m - l && !ok; mm++) {
+            int s = m - l - mm;
+            if (l * 8 + mm * 4 + s == total) {
+                if (place(l, mm, s)) {
+                    ok = true;
+                    break;
+                }
+            }
+        }
+    }
+
+    if (!ok) {
+        cout << "NO\n";
+    } else {
+        cout << "YES\n";
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < W; j++) {
+                cout << grid[i][j];
+            }
+            cout << '\n';
+        }
+    }
+
+    return 0;
+}

@@ -1,0 +1,45 @@
+#include <iostream>
+using namespace std;
+
+const int MAXN = 100005;
+int next_node[MAXN];
+int prev_node[MAXN];
+
+int main() {
+    int n, m;
+    cin >> n >> m;
+
+    for (int i = 1; i <= n; i++) {
+        next_node[i] = i + 1;
+        prev_node[i] = i - 1;
+    }
+    next_node[n] = 1;
+    prev_node[1] = n;
+
+    for (int i = 0; i < m; i++) {
+        int x, y;
+        cin >> x >> y;
+
+        int px = prev_node[x];
+        int nx = next_node[x];
+        next_node[px] = nx;
+        prev_node[nx] = px;
+
+        int ny = next_node[y];
+        next_node[y] = x;
+        prev_node[x] = y;
+        next_node[x] = ny;
+        prev_node[ny] = x;
+    }
+
+    int cur = 1;
+    for (int i = 0; i < n; i++) {
+        cout << cur;
+        if (i < n - 1) 
+            cout << " ";
+        cur = next_node[cur];
+    }
+    cout << endl;
+
+    return 0;
+}

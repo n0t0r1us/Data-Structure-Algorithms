@@ -1,0 +1,37 @@
+#include <iostream>
+#include <vector>
+using namespace std;
+
+int main() {
+    ios::sync_with_stdio(false);
+    cin.tie(0);
+
+    int N, M;
+    cin >> N >> M;
+    vector<int> a(N+1);
+
+    vector<int> zeroCount(N+1,0);
+    vector<int> negCount(N+1,0);
+
+    for (int i=1; i<=N; i++) {
+        cin >> a[i];
+        zeroCount[i] = zeroCount[i-1] + (a[i] == 0 ? 1 : 0);
+        negCount[i] = negCount[i-1] + (a[i] < 0 ? 1 : 0);
+    }
+
+    for (int i=0; i<M; i++) {
+        int L, R;
+        cin >> L >> R;
+
+        int zeros = zeroCount[R] - zeroCount[L-1];
+        if (zeros > 0) {
+            cout << "0\n";
+            continue;
+        }
+        int negs = negCount[R] - negCount[L-1];
+        if (negs % 2 == 0) cout << "+\n";
+        else cout << "-\n";
+    }
+
+    return 0;
+}

@@ -1,0 +1,57 @@
+#include <iostream>
+#include <vector>
+using namespace std;
+typedef long long ll;
+
+struct Fenwick {
+    int n;
+    vector<ll> bit;
+    Fenwick(int n_=0) { init(n_); }
+    void init(int n_) {
+        n = n_;
+        bit.assign(n+1, 0);
+    }
+    // add val at index x (1-based)
+    void add(int x, ll val) {
+        for (; x <= n; x += x & -x) bit[x] += val;
+    }
+    // sum 1..x
+    ll sum(int x) {
+        ll r = 0;
+        for (; x > 0; x -= x & -x) r += bit[x];
+        return r;
+    }
+    // sum l..r
+    ll sum(int l, int r) {
+        if (r < l) return 0;
+        return sum(r) - sum(l-1);
+    }
+};
+
+int main() {
+    ios::sync_with_stdio(false);
+    cin.tie(0);
+    int n;
+    if (!(cin >> n)) return 0;
+    vector<int> a(n);
+    int maxA = 0;
+    for (int i = 0; i < n; ++i) {
+        cin >> a[i];
+        if (a[i] > maxA) maxA = a[i];
+    }
+
+    Fenwick fw(maxA + 5);
+    ll inv = 0;
+    ll seen = 0;
+    for (int i = 0; i < n; ++i) {
+        int val = a[i];
+        // count of numbers <= val seen so far
+        ll le = fw.sum(val);
+        inv += (seen - le); // those greater than val
+        fw.add(val, 1);
+        ++seen;
+    }
+
+    cout << inv << "\n";
+    return 0;
+}

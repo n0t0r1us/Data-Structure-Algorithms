@@ -1,0 +1,51 @@
+#include <bits/stdc++.h>
+using namespace std;
+typedef unsigned __int128 u128;
+typedef unsigned long long ull;
+
+int main(){
+    ios::sync_with_stdio(false);
+    cin.tie(0);
+    int T;
+    if (!(cin >> T)) return 0;
+    while (T--) {
+        int M;
+        unsigned long long k;
+        cin >> M >> k;
+        vector<int> S(M);
+        for (int i = 0; i < M; ++i) cin >> S[i];
+        sort(S.begin(), S.end());
+        // find len
+        u128 pow = 1; // M^len
+        u128 sum = 0;
+        int len = 0;
+        u128 Ku = (u128) k;
+        while (true) {
+            // compute next pow *= M
+            pow = pow * (u128)M;
+            ++len;
+            sum += pow;
+            if (sum >= Ku) break;
+            // safety: if pow becomes huge no problem because u128 big enough for our ranges
+        }
+        // sum_{i=1..len-1} M^i = sum - pow
+        u128 prevSum = sum - pow;
+        u128 offset = Ku - prevSum - (u128)1; // 0-based index within length-len strings
+        // build powers of M: p[i] = M^i for i=0..len-1
+        vector<u128> p(len);
+        p[0] = 1;
+        for (int i = 1; i < len; ++i) p[i] = p[i-1] * (u128)M;
+        // produce digits by dividing offset by p[len-1], p[len-2], ...
+        string res;
+        for (int pos = len-1; pos >= 0; --pos) {
+            u128 base = p[pos];
+            // idx = offset / base
+            u128 idx128 = offset / base;
+            unsigned long long idx = (unsigned long long) idx128; // idx fits in ull because idx < M <= 8
+            res.push_back(char('0' + S[(size_t)idx])); // S[idx] is digit (0..9 but given >0)
+            offset = offset % base;
+        }
+        cout << res << '\n';
+    }
+    return 0;
+}

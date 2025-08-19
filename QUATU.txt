@@ -1,0 +1,74 @@
+#include <iostream>
+#include <vector>
+#include <cstdio>
+using namespace std;
+typedef long long ll;
+
+int main(){
+    ios::sync_with_stdio(false);
+    cin.tie(0);
+    int n;
+    if (!(cin >> n)) return 0;
+    vector< vector<ll> > a(n+1, vector<ll>(n+1, 0));
+    for (int i = 1; i <= n; ++i)
+        for (int j = 1; j <= n; ++j)
+            cin >> a[i][j];
+
+    // diag1 index = i+j (range 2..2n)
+    // diag2 index = i-j + n (range 1..2n-1)
+    vector<ll> diag1(2*n+3, 0), diag2(2*n+3, 0);
+    for (int i = 1; i <= n; ++i)
+        for (int j = 1; j <= n; ++j) {
+            diag1[i+j] += a[i][j];
+            diag2[i-j + n] += a[i][j];
+        }
+
+    ll bestBlackVal = -1;
+    int by = 1, bx = 1;
+    ll bestWhiteVal = -1;
+    int wy = 1, wx = 1;
+
+    for (int i = 1; i <= n; ++i) {
+        for (int j = 1; j <= n; ++j) {
+            ll val = diag1[i+j] + diag2[i-j + n] - a[i][j];
+            if ( ( (i + j) % 2 ) == 0 ) { // black cell (even parity)
+                if (val > bestBlackVal) {
+                    bestBlackVal = val;
+                    by = i; bx = j;
+                }
+            } else { // white cell
+                if (val > bestWhiteVal) {
+                    bestWhiteVal = val;
+                    wy = i; wx = j;
+                }
+            }
+        }
+    }
+
+    // In trường hợp một màu không tồn tại (chỉ xảy ra n=1), xử lý:
+    if (bestBlackVal < 0) { // không tìm được ô black -> chọn (1,1) với giá trị tính đúng
+        bestBlackVal = diag1[1+1] + diag2[1-1 + n] - a[1][1];
+        by = bx = 1;
+    }
+    if (bestWhiteVal < 0) {
+        // tìm bất kỳ ô khác; nếu không có ô trắng, đặt vào (1,1) và giá trị 0
+        // nhưng để an toàn, duyệt tìm 1 ô trắng nếu có
+        bool found = false;
+        for (int i = 1; i <= n && !found; ++i)
+            for (int j = 1; j <= n; ++j)
+                if ((i+j)%2==1) {
+                    wy = i; wx = j;
+                    bestWhiteVal = diag1[i+j] + diag2[i-j + n] - a[i][j];
+                    found = true; break;
+                }
+        if (!found) { // không có ô trắng (n=1)
+            wy = wx = 1;
+            bestWhiteVal = 0;
+        }
+    }
+
+    ll total = bestBlackVal + bestWhiteVal;
+    cout << total << "\n";
+    cout << by << " " << bx << " " << wy << " " << wx << "\n";
+    return 0;
+}

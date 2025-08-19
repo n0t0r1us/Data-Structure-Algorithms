@@ -1,0 +1,21 @@
+#include <iostream>
+using namespace std;
+
+int main() {
+    long long a;
+    if (!(cin >> a)) return 0;
+    long long a2 = a * a;
+    long long cnt = 0;
+    for (long long d = 1; d < a; ++d) {
+        if (a2 % d != 0) continue;
+        long long x = d;
+        long long y = a2 / d;
+        if (x >= y) continue; // đảm bảo x < y
+        // cùng chẵn lẻ?
+        if ((x & 1LL) != (y & 1LL)) continue;
+        long long b = (y - x) / 2;
+        if (b > a) ++cnt;
+    }
+    cout << cnt << "\n";
+    return 0;
+}

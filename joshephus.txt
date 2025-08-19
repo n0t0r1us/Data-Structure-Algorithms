@@ -1,0 +1,72 @@
+#include <iostream>
+using namespace std;
+
+struct Node {
+    int data;
+    Node* next;
+};
+
+// Tạo một node mới
+Node* MakeNode(int x) {
+    Node* p = new Node;
+    p->data = x;
+    p->next = NULL;
+    return p;
+}
+
+// Tạo danh sách liên kết vòng với k binh sĩ
+Node* CreateCircle(int k) {
+    Node* head = NULL;
+    Node* tail = NULL;
+    for (int i = 1; i <= k; i++) {
+        Node* p = MakeNode(i);
+        if (head == NULL) {
+            head = tail = p;
+            p->next = head;
+        } else {
+            tail->next = p;
+            tail = p;
+            tail->next = head;
+        }
+    }
+    return head;
+}
+
+// Xóa node đứng sau node curr
+void DeleteAfter(Node*& curr) {
+    Node* temp = curr->next;
+    curr->next = temp->next;
+    delete temp;
+}
+
+// Thực hiện thuật toán Josephus
+int Josephus(int k, int n) {
+    Node* head = CreateCircle(k);
+    Node* p = head;
+
+    // Duyệt đến khi còn 1 người
+    while (p->next != p) {
+        for (int i = 1; i < n - 1; i++)
+            p = p->next;
+
+        // Người bị loại là p->next
+        DeleteAfter(p);
+
+        // Di chuyển đến người tiếp theo
+        p = p->next;
+    }
+
+    int result = p->data;
+    delete p;
+    return result;
+}
+
+int main() {
+    int k, n;
+    cin >> k >> n;
+
+    int result = Josephus(k, n);
+    cout << result << endl;
+
+    return 0;
+}

@@ -1,0 +1,61 @@
+#include <iostream>
+#include <vector>
+#include <algorithm>
+using namespace std;
+
+struct Segment {
+    int s, d, idx;
+};
+
+bool cmp(Segment a, Segment b) {
+    if (a.s != b.s) return a.s < b.s;
+    return a.d > b.d;
+}
+
+int main() {
+    int n, a, b;
+    cin >> n >> a >> b;
+
+    vector<Segment> segs;
+
+    for (int i = 1; i <= n; ++i) {
+        int s, d;
+        cin >> s >> d;
+        if (d > a && s < b)
+            segs.push_back((Segment){s, d, i});
+    }
+
+    sort(segs.begin(), segs.end(), cmp);
+
+    int curr = a, i = 0;
+    vector<int> res;
+
+    while (curr < b) {
+        int farthest = curr;
+        int best_idx = -1;
+
+        while (i < segs.size() && segs[i].s <= curr) {
+            if (segs[i].d > farthest) {
+                farthest = segs[i].d;
+                best_idx = i;
+            }
+            ++i;
+        }
+
+        if (best_idx == -1) {
+            cout << -1 << endl;
+            return 0;
+        }
+
+        res.push_back(segs[best_idx].idx);
+        curr = farthest;
+    }
+
+    cout << res.size() << endl;
+    for (int j = 0; j < res.size(); ++j)
+        cout << res[j] << " ";
+    cout << endl;
+
+    return 0;
+}
+    

@@ -1,0 +1,70 @@
+#include <iostream>
+#include <queue>
+#include <vector>
+
+using namespace std;
+
+const int MAX_N = 9;
+
+struct Point {
+    int x, y;
+    Point(int _x, int _y) : x(_x), y(_y) {}
+};
+
+int n, sy, sx, dy, dx;
+int board[MAX_N][MAX_N];
+bool visited[MAX_N][MAX_N];
+
+int dxs[] = {1, -1, 0, 0};
+int dys[] = {0, 0, 1, -1};
+
+bool isValid(int x, int y) {
+    return x >= 0 && x < n && y >= 0 && y < n;
+}
+
+bool BFS() {
+    queue<Point> q;
+    q.push(Point(sx - 1, sy - 1));
+    visited[sy - 1][sx - 1] = true;
+
+    while (!q.empty()) {
+        Point curr = q.front();
+        q.pop();
+
+        int x = curr.x;
+        int y = curr.y;
+
+        if (x == dx - 1 && y == dy - 1) {
+            return true;
+        }
+
+        for (int i = 0; i < 4; i++) {
+            int newX = x + dxs[i];
+            int newY = y + dys[i];
+
+            if (isValid(newX, newY) && !visited[newY][newX] && board[newY][newX] == 0) {
+                visited[newY][newX] = true;
+                q.push(Point(newX, newY));
+            }
+        }
+    }
+
+    return false;
+}
+
+int main() {
+    cin >> n >> sy >> sx >> dy >> dx;
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < n; j++) {
+            cin >> board[i][j];
+        }
+    }
+
+    if (BFS()) {
+        cout << "YES" << endl;
+    } else {
+        cout << "NO" << endl;
+    }
+
+    return 0;
+}

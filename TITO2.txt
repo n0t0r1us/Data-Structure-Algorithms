@@ -1,0 +1,29 @@
+#include <iostream>
+#include <cmath>
+
+using namespace std;
+
+#define FOR(i,a,b) for(int i=a; i<=b; i++)
+#define MOD 1000000007
+
+typedef long long LL;
+
+int main()
+{
+	double A,B;
+	LL a,b;
+	
+	cin>>A>>B;
+	
+	a = ceil(A);
+	b = floor(B);
+	
+     LL sb = b * (b + 1) / 2 % (MOD) * (2 * b + 1) / 3;
+	 LL sa = a * (a - 1) / 2 % (MOD) * (2 * a - 1) / 3;
+        
+	if (sb < sa) sb += MOD;
+    	cout<<((sb - sa) % MOD)<<endl;
+	
+	
+	return 0;
+}

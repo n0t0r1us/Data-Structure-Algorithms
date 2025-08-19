@@ -1,0 +1,67 @@
+#include <iostream>
+#include <cmath>
+using namespace std;
+
+typedef unsigned long long ull;
+
+int main() {
+    ios_base::sync_with_stdio(false);
+    cin.tie(NULL);
+
+    ull S, K, U;
+    cin >> S >> K >> U;
+
+    ull start = K + 1;
+    ull res = 0;
+
+    int len = 0;
+    ull temp = start;
+    while (temp > 0) {
+        len++;
+        temp /= 10;
+    }
+    if (start == 0) len = 1; // nếu start = 0
+
+    while (S > 0) {
+        // Tính end = 10^len - 1
+        ull end = 1;
+        for (int i = 0; i < len; i++) {
+            if (end > (1000000000000000000ULL / 10)) { // tránh tràn 10^18
+                end = 1000000000000000000ULL; // max 10^18 ~
+                break;
+            }
+            end *= 10;
+        }
+        if (end > 0) end--;
+        if (end < start) {
+            len++;
+            continue;
+        }
+
+        ull count = end - start + 1;
+
+        // Kiểm tra chi phí có vượt S không: cost = count * len * U
+        // Kiểm tra tràn khi nhân:
+        // Nếu count > S / (len * U) thì ko đủ tiền.
+        ull cost_per_num = (ull)len * U;
+        if (cost_per_num == 0) break; // tránh chia 0
+
+        ull max_count = S / cost_per_num;
+
+        if (count <= max_count) {
+            // Thêm hết đoạn
+            S -= count * cost_per_num;
+            res += count;
+            start = end + 1;
+            len++;
+        } else {
+            // Thêm được tối đa max_count
+            res += max_count;
+            break;
+        }
+    }
+
+    cout << res << "\n";
+
+    return 0;
+}

@@ -1,0 +1,32 @@
+#include <iostream>
+#include <vector>
+#include <algorithm>
+using namespace std;
+
+int main() {
+    int n;
+    cin >> n;
+    vector<int> A(n), B(n);
+    
+    for (int i = 0; i < n; ++i) cin >> A[i];
+    for (int i = 0; i < n; ++i) cin >> B[i];
+
+    sort(A.begin(), A.end());
+    sort(B.begin(), B.end());
+
+    int i = 0, j = 0, point = 0;
+
+    // Ghép cặp tối ưu
+    while (i < n && j < n) {
+        if (B[j] > A[i]) {
+            point++;
+            i++;
+            j++;
+        } else {
+            j++; // bỏ qua người yếu hơn hoặc bằng
+        }
+    }
+
+    cout << point << endl;
+    return 0;
+}

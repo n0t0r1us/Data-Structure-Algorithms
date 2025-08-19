@@ -1,0 +1,26 @@
+#include <iostream>
+#include <string>
+using namespace std;
+
+int main() {
+    int n;
+    cin >> n;
+    int W = 2 * (n + 2) - 1; // chiều rộng khung
+
+    for (int stage = 0; stage < 3; stage++) {
+        int h = n + stage; // chiều cao mỗi tầng
+        for (int i = 1; i <= h; i++) {
+            int total_chars = 2 * i - 1; // số ký tự không tính khoảng trống
+            string line;
+            if (total_chars == 1) {
+                line = "#";
+            } else {
+                line = "#" + string(total_chars - 2, 'x') + "#";
+            }
+            // căn giữa bằng dấu '.'
+            int dots = (W - total_chars) / 2;
+            cout << string(dots, '.') << line << string(dots, '.') << "\n";
+        }
+    }
+    return 0;
+}

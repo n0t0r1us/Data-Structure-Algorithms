@@ -1,0 +1,34 @@
+#include <bits/stdc++.h>
+using namespace std;
+
+int main() {
+    ios::sync_with_stdio(false);
+    cin.tie(0);
+    int T;
+    if (!(cin >> T)) return 0;
+    while (T--) {
+        int N;
+        string s;
+        cin >> N;
+        cin >> s;
+        int cD = 0, cV = 0, cX = 0;
+        for (int i = 0; i < N; ++i) {
+            if (s[i] == 'D') ++cD;
+            else if (s[i] == 'V') ++cV;
+            else if (s[i] == 'X') ++cX;
+        }
+        if (cD == N || cV == N || cX == N) {
+            cout << 0 << "\n";
+            continue;
+        }
+        int pD = cD % 2;
+        int pV = cV % 2;
+        int pX = cX % 2;
+        if (pD == pV && pV == pX) {
+            cout << (N - 2) << "\n";
+        } else {
+            cout << (N - 1) << "\n";
+        }
+    }
+    return 0;
+}

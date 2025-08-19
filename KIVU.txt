@@ -1,0 +1,34 @@
+#include <iostream>
+#include <vector>
+#include <algorithm>
+using namespace std;
+
+int main() {
+    int n, m;
+    cin >> n >> m;
+
+    vector<int> male(n), female(m);
+
+    for (int i = 0; i < n; ++i) cin >> male[i];
+    for (int i = 0; i < m; ++i) cin >> female[i];
+
+    sort(male.begin(), male.end());
+    sort(female.begin(), female.end());
+
+    int i = 0, j = 0, count = 0;
+
+    while (i < n && j < m) {
+        if (male[i] > female[j]) {
+            // Ghép cặp được
+            count++;
+            i++;
+            j++;
+        } else {
+            // Bạn nam quá thấp -> xét bạn nam tiếp theo
+            i++;
+        }
+    }
+
+    cout << count << endl;
+    return 0;
+}

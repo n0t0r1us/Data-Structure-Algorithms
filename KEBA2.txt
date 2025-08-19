@@ -1,0 +1,36 @@
+#include <iostream>
+#include <vector>
+#include <cmath>
+#include <map>
+
+using namespace std;
+
+#define FOR(i,a,b) for(int i=a; i<=b; i++)
+#define DOWN(i,a,b) for(int i=a; i>=b; i--)
+
+typedef long long LL;
+typedef map<LL,int>::iterator IT;
+
+
+int main()
+{
+	int n;
+	LL B,T=0;
+	vector<LL> a;
+	map<LL,int> count;
+	map<LL,bool> checked;
+	
+	cin>>n>>B;
+	
+	a.resize(n+1);
+	FOR(i,1,n)
+	{
+		cin>>a[i];
+		T += count[B - a[i]];
+		count[a[i]]++;
+	}
+	
+	cout<<T<<endl;
+	
+	return 0;
+}

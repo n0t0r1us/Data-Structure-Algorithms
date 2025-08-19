@@ -1,0 +1,112 @@
+#include <bits/stdc++.h>
+using namespace std;
+
+int main() {
+    int N, M;
+    if (!(cin >> N >> M)) return 0;
+    vector<vector<int> > obs(N+1, vector<int>(M+1, 0));
+    for (int i = 1; i <= N; ++i) {
+        for (int j = 1; j <= M; ++j) {
+            cin >> obs[i][j];
+        }
+    }
+    int yd, xd;
+    cin >> yd >> xd;
+
+    int dr[4] = {0, 1, 0, -1};
+    int dc[4] = {1, 0, -1, 0};
+
+    static int prevY[21][21][4];
+    static int prevX[21][21][4];
+    static int prevD[21][21][4];
+    for (int i = 1; i <= N; ++i)
+        for (int j = 1; j <= M; ++j)
+            for (int d = 0; d < 4; ++d)
+                prevD[i][j][d] = -2;
+
+    queue< pair<pair<int,int>,int> > q;
+
+    if (1 <= 1 && 2 <= M && obs[1][2] == 0) {
+        int ny = 1, nx = 2, nd = 0;
+        prevY[ny][nx][nd] = 1;
+        prevX[ny][nx][nd] = 1;
+        prevD[ny][nx][nd] = -1;
+        q.push(make_pair(make_pair(ny,nx),nd));
+    }
+    if (2 <= N && 1 <= 1 && obs[2][1] == 0) {
+        int ny = 2, nx = 1, nd = 1;
+        prevY[ny][nx][nd] = 1;
+        prevX[ny][nx][nd] = 1;
+        prevD[ny][nx][nd] = -1;
+        q.push(make_pair(make_pair(ny,nx),nd));
+    }
+
+    bool found = false;
+    int fy=-1, fx=-1, fd=-1;
+
+    while (!q.empty() && !found) {
+        int y = q.front().first.first;
+        int x = q.front().first.second;
+        int d = q.front().second;
+        q.pop();
+        if (y == yd && x == xd) {
+            found = true;
+            fy = y; fx = x; fd = d;
+            break;
+        }
+        int nd = d;
+        int ny = y + dr[nd];
+        int nx = x + dc[nd];
+        if (ny >= 1 && ny <= N && nx >= 1 && nx <= M && obs[ny][nx] == 0) {
+            if (prevD[ny][nx][nd] == -2) {
+                prevY[ny][nx][nd] = y;
+                prevX[ny][nx][nd] = x;
+                prevD[ny][nx][nd] = d;
+                q.push(make_pair(make_pair(ny,nx),nd));
+                if (ny == yd && nx == xd) { found = true; fy=ny; fx=nx; fd=nd; break; }
+            }
+        }
+        nd = (d + 3) % 4;
+        ny = y + dr[nd];
+        nx = x + dc[nd];
+        if (ny >= 1 && ny <= N && nx >= 1 && nx <= M && obs[ny][nx] == 0) {
+            if (prevD[ny][nx][nd] == -2) {
+                prevY[ny][nx][nd] = y;
+                prevX[ny][nx][nd] = x;
+                prevD[ny][nx][nd] = d;
+                q.push(make_pair(make_pair(ny,nx),nd));
+                if (ny == yd && nx == xd) { found = true; fy=ny; fx=nx; fd=nd; break; }
+            }
+        }
+    }
+
+    if (!found) {
+        cout << 0 << "\n";
+        return 0;
+    }
+
+    vector<pair<int,int> > path;
+    int cy = fy, cx = fx, cd = fd;
+    while (true) {
+        path.push_back(make_pair(cy,cx));
+        int py = prevY[cy][cx][cd];
+        int px = prevX[cy][cx][cd];
+        int pd = prevD[cy][cx][cd];
+        if (pd == -1) {
+            path.push_back(make_pair(py, px));
+            break;
+        } else {
+            cy = py; cx = px; cd = pd;
+        }
+    }
+    reverse(path.begin(), path.end());
+    if ((int)path.size() > 2000) {
+        cout << 0 << "\n";
+        return 0;
+    }
+    cout << path.size() << "\n";
+    for (size_t i = 0; i < path.size(); ++i) {
+        cout << path[i].first << " " << path[i].second << "\n";
+    }
+    return 0;
+}

@@ -1,0 +1,58 @@
+#include <iostream>
+#include <cmath>
+using namespace std;
+
+struct Node {
+    int data;
+    Node* left;
+    Node* right;
+};
+
+// T?o node m?i
+Node* createNode(int x) {
+    Node* node = new Node;
+    node->data = x;
+    node->left = node->right = NULL;
+    return node;
+}
+
+// Nh?p cây t? bàn phím theo ti?n t?
+Node* inputTree() {
+    int x;
+    cin >> x;
+    if (x == -1) return NULL;
+
+    Node* root = createNode(x);
+    root->left = inputTree();   // Nh?p cây con trái
+    root->right = inputTree();  // Nh?p cây con ph?i
+    return root;
+}
+
+// Ð?m s? nút
+int countNodes(Node* root) {
+    if (root == NULL) return 0;
+    return 1 + countNodes(root->left) + countNodes(root->right);
+}
+
+// Ki?m tra cây cân b?ng hoàn toàn
+bool isCompletelyBalanced(Node* root) {
+    if (root == NULL) return true;
+
+    int leftCount = countNodes(root->left);
+    int rightCount = countNodes(root->right);
+
+    if (abs(leftCount - rightCount) > 1) return false;
+
+    return isCompletelyBalanced(root->left) && isCompletelyBalanced(root->right);
+}
+
+int main() {
+    Node* root = inputTree(); // Nh?p cây
+
+    if (isCompletelyBalanced(root))
+        cout << "YES\n";
+    else
+        cout << "NO\n";
+
+    return 0;
+}

@@ -1,0 +1,23 @@
+#include <iostream>
+
+int main() {
+    int n;
+    std::cin >> n;
+    int mat[100][100];
+    for (int i = 0; i < n; ++i) {
+        for (int j = 0; j < n; ++j) {
+            std::cin >> mat[i][j];
+        }
+    }
+    int sumDiagonalMain = 0;
+    for (int i = 0; i < n; ++i) {
+        sumDiagonalMain += mat[i][i];
+    }
+    int sumDiagonalSub = 0;
+    for (int i = 0; i < n; ++i) {
+        sumDiagonalSub += mat[i][n - i - 1];
+    }
+    std::cout << sumDiagonalMain << " " << sumDiagonalSub << std::endl;
+
+    return 0;
+}

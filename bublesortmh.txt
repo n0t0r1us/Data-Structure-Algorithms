@@ -1,0 +1,55 @@
+#include <iostream>
+#include <windows.h>
+using namespace std;
+
+void gotoxy(int x, int y) {
+    COORD pos = { (SHORT)x, (SHORT)y };
+    SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), pos);
+}
+
+void delay(int milliseconds) {
+    Sleep(milliseconds); // t?m d?ng d? th?y rõ s? thay d?i
+}
+
+void printArray(int a[], int n, int y) {
+    gotoxy(0, y);
+    for (int i = 0; i < n; ++i) {
+        cout << a[i] << " ";
+    }
+    cout << "       "; // xóa ph?n du n?u có
+}
+
+void swap(int& a, int& b) {
+    int tmp = a;
+    a = b;
+    b = tmp;
+}
+
+void bubbleSortVisual(int a[], int n) {
+    int y = 2; // b?t d?u in t? dòng th? 2
+    printArray(a, n, y);
+    delay(500);
+    for (int i = 0; i < n - 1; ++i) {
+        bool swapped = false;
+        for (int j = 0; j < n - i - 1; ++j) {
+            if (a[j] > a[j + 1]) {
+                swap(a[j], a[j + 1]);
+                swapped = true;
+                y++;
+                printArray(a, n, y);
+                delay(500);
+            }
+        }
+        if (!swapped) break;
+    }
+}
+
+int main() {
+    int a[] = { 34, 12, 25, 10, 30 };
+    int n = sizeof(a) / sizeof(a[0]);
+
+    bubbleSortVisual(a, n);
+
+    gotoxy(0, 15);
+    return 0;
+}

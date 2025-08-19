@@ -1,0 +1,25 @@
+#include <iostream>
+#include <string>
+
+void generateBinaryStrings(int n, std::string current) {
+    if (n == 0) {
+        std::cout << current << std::endl;
+    } else {
+        generateBinaryStrings(n - 1, current + "0");
+        generateBinaryStrings(n - 1, current + "1");
+    }
+}
+
+int main() {
+    int n;
+    std::cin >> n;
+
+    if (n < 1 || n > 20) {
+        std::cout << "" << std::endl;
+        return 1;
+    }
+
+    generateBinaryStrings(n, "");
+
+    return 0;
+}

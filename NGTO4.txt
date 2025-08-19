@@ -1,0 +1,32 @@
+#include <iostream>
+#include <cstring>
+using namespace std;
+
+const int MAXX = 1000005;
+const int INF = 1000000000;
+int dp[MAXX];
+int primes[4] = {2, 3, 5, 7};
+
+int main() {
+    int i, j;
+    for (i = 0; i < MAXX; ++i) dp[i] = INF;
+    dp[0] = 0;
+
+    for (i = 1; i < MAXX; ++i) {
+        for (j = 0; j < 4; ++j) {
+            if (i - primes[j] >= 0 && dp[i - primes[j]] != INF) {
+                if (dp[i] > dp[i - primes[j]] + 1)
+                    dp[i] = dp[i - primes[j]] + 1;
+            }
+        }
+    }
+
+    int T, x;
+    cin >> T;
+    while (T--) {
+        cin >> x;
+        if (dp[x] == INF) cout << -1 << '\n';
+        else cout << dp[x] << '\n';
+    }
+    return 0;
+}

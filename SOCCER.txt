@@ -1,0 +1,69 @@
+#include <iostream>
+#include <vector>
+#include <cstring>
+using namespace std;
+
+int n;
+char w[16][16];
+long long dp[1 << 16][16];
+
+bool win(int a, int b) {
+    return w[a][b] == 'Y';
+}
+
+int countBits(int x) {
+    int cnt = 0;
+    while (x) {
+        cnt += x & 1;
+        x >>= 1;
+    }
+    return cnt;
+}
+
+int main() {
+    cin >> n;
+    for (int i = 0; i < n; ++i) {
+        cin >> w[i];
+    }
+
+    memset(dp, 0, sizeof(dp));
+
+    // Khởi tạo: mỗi đội 1 có thể vô địch nếu chỉ có mình nó
+    for (int i = 0; i < n; ++i) {
+        dp[1 << i][i] = 1;
+    }
+
+    for (int mask = 1; mask < (1 << n); ++mask) {
+        int cnt = countBits(mask);
+        if (cnt == 1) continue;
+        if ((cnt & (cnt - 1)) != 0) continue; // Không phải lũy thừa của 2
+
+        for (int sub = (mask - 1) & mask; sub; sub = (sub - 1) & mask) {
+            int other = mask ^ sub;
+            if (countBits(sub) * 2 != cnt) continue;
+
+            for (int i = 0; i < n; ++i) {
+                if (!(sub & (1 << i))) continue;
+                if (dp[sub][i] == 0) continue;
+
+                for (int j = 0; j < n; ++j) {
+                    if (!(other & (1 << j))) continue;
+                    if (dp[other][j] == 0) continue;
+
+                    if (win(i, j)) {
+                        dp[mask][i] += dp[sub][i] * dp[other][j];
+                    } else {
+                        dp[mask][j] += dp[sub][i] * dp[other][j];
+                    }
+                }
+            }
+        }
+    }
+
+    int full = (1 << n) - 1;
+    for (int i = 0; i < n; ++i) {
+        cout << dp[full][i] << endl;
+    }
+
+    return 0;
+}

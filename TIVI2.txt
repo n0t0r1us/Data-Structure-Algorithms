@@ -1,0 +1,45 @@
+#include <iostream>
+#include <vector>
+#include <algorithm>
+#include <set>
+
+using namespace std;
+
+typedef pair<int, int> Interval;
+
+int main() {
+    int n;
+    cin >> n;
+    vector<Interval> shows(n);
+
+    for (int i = 0; i < n; ++i) {
+        cin >> shows[i].first >> shows[i].second; // s, t
+    }
+
+    // Sắp xếp theo thời điểm bắt đầu
+    sort(shows.begin(), shows.end());
+
+    // Multiset lưu thời điểm kết thúc để kiểm tra trùng
+    multiset<int> endings;
+
+    long long total_conflicts = 0;
+
+    for (int i = 0; i < n; ++i) {
+        int si = shows[i].first;
+        int ti = shows[i].second;
+
+        // Xóa các chương trình đã kết thúc trước hoặc đúng lúc chương trình hiện tại bắt đầu
+        while (!endings.empty() && *endings.begin() <= si) {
+            endings.erase(endings.begin());
+        }
+
+        // Số chương trình hiện tại còn trong endings là các chương trình đang chiếu khi chương trình i bắt đầu
+        total_conflicts += endings.size();
+
+        // Thêm kết thúc của chương trình hiện tại vào tập
+        endings.insert(ti);
+    }
+
+    cout << total_conflicts << endl;
+    return 0;
+}

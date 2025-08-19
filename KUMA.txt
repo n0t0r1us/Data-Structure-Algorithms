@@ -1,0 +1,25 @@
+#include <iostream>
+using namespace std;
+
+int main() {
+    int m, n, t;
+    cin >> m >> n >> t;
+
+    int left = 0, right = n * 2;
+    long long res = 1LL * n * t;
+
+    while (left <= right) {
+        int mid = (left + right) / 2;
+        int total = mid + (mid / m);
+
+        if (total >= n) {
+            res = 1LL * mid * t;
+            right = mid - 1;
+        } else {
+            left = mid + 1;
+        }
+    }
+
+    cout << res << endl;
+    return 0;
+}

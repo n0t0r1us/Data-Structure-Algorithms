@@ -1,0 +1,30 @@
+#include <iostream>
+#include <string>
+using namespace std;
+
+int main() {
+    string s;
+    cin >> s;
+
+    int count = 0;
+    string word = "";
+
+    for (int i = 0; i < s.length(); ++i) {
+        if (s[i] == '.') {
+            if (!word.empty()) {
+                count++;
+                word = "";
+            }
+        } else {
+            word += s[i];
+        }
+    }
+
+    // Trường hợp từ cuối không kết thúc bằng '.'
+    if (!word.empty()) {
+        count++;
+    }
+
+    cout << count;
+    return 0;
+}

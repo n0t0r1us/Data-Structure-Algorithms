@@ -1,0 +1,54 @@
+#include <iostream>
+#include <vector>
+#include <string>
+using namespace std;
+
+long long llabs98(long long v) {
+    return v < 0 ? -v : v;
+}
+
+int main() {
+    ios::sync_with_stdio(false);
+    cin.tie(0);
+
+    int n, k;
+    cin >> n >> k;
+    vector<long long> x(n), y(n);
+    for (int i = 0; i < n; i++) {
+        cin >> x[i] >> y[i];
+    }
+    string s;
+    cin >> s; // k ký tự '1' hoặc '2'
+
+    long long min_need = (1LL << 60); // giá trị tổng mở rộng tối thiểu
+
+    for (int i = 0; i < n; i++) {
+        for (int j = i + 1; j < n; j++) {
+            long long dx = llabs98(x[i] - x[j]);
+            long long dy = llabs98(y[i] - y[j]);
+            long long D = dx > dy ? dx : dy;
+            long long req_half = (D + 1) / 2; // ceil(D/2)
+            long long need_sum = req_half - 1; // tổng mở rộng cần
+            if (need_sum < min_need) min_need = need_sum;
+        }
+    }
+
+    if (min_need <= 0) { // chạm ngay từ đầu
+        cout << 0 << "\n";
+        return 0;
+    }
+
+    long long cur = 0;
+    int ans = -1;
+    for (int i = 0; i < k; i++) {
+        if (s[i] == '1') cur += 1;
+        else cur += 2;
+        if (cur >= min_need) {
+            ans = i + 1; // tháng tính từ 1
+            break;
+        }
+    }
+
+    cout << ans << "\n";
+    return 0;
+}

@@ -1,0 +1,74 @@
+#include <iostream>
+using namespace std;
+
+struct Node {
+    int data;
+    Node* next;
+};
+
+// Tạo nút mới
+Node* MakeNode(int x) {
+    Node* p = new Node;
+    p->data = x;
+    p->next = NULL;
+    return p;
+}
+
+// Thêm vào cuối danh sách
+void InsertLast(Node*& head, int x) {
+    Node* p = MakeNode(x);
+    if (head == NULL) {
+        head = p;
+    } else {
+        Node* temp = head;
+        while (temp->next != NULL)
+            temp = temp->next;
+        temp->next = p;
+    }
+}
+
+// Duyệt và in danh sách
+void PrintList(Node* head) {
+    Node* p = head;
+    while (p != NULL) {
+        cout << p->data << " ";
+        p = p->next;
+    }
+    cout << endl;
+}
+
+// Đảo ngược danh sách
+void ReverseList(Node*& head) {
+    Node* prev = NULL;
+    Node* current = head;
+    Node* next = NULL;
+
+    while (current != NULL) {
+        next = current->next;     // lưu node tiếp theo
+        current->next = prev;     // đảo chiều
+        prev = current;           // cập nhật prev
+        current = next;           // sang node tiếp theo
+    }
+    head = prev; // cập nhật head mới
+}
+
+int main() {
+    Node* head = NULL;
+    int n, x;
+    cin >> n;
+    for (int i = 0; i < n; ++i) {
+        cin >> x;
+        InsertLast(head, x);
+    }
+
+    // In danh sách ban đầu
+    PrintList(head);
+
+    // Đảo ngược danh sách
+    ReverseList(head);
+
+    // In danh sách sau khi đảo
+    PrintList(head);
+
+    return 0;
+}

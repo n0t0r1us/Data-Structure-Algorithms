@@ -1,0 +1,27 @@
+#include <iostream>
+using namespace std;
+
+int main() {
+    int n, m;
+    cin >> n >> m;
+
+    int a[105][105];
+    for (int i = 0; i < n; i++)
+        for (int j = 0; j < m; j++)
+            cin >> a[i][j];
+
+    int total = 0;
+
+    for (int j = 0; j < m; j++) {
+        int empty = 0; // số ô trống phía dưới
+        for (int i = n - 1; i >= 0; i--) {
+            if (a[i][j] == 0)
+                empty++;
+            else
+                total += empty;
+        }
+    }
+
+    cout << total;
+    return 0;
+}

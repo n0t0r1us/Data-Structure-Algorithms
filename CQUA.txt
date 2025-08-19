@@ -1,0 +1,40 @@
+#include <iostream>
+using namespace std;
+
+int main() {
+    int n;
+    cin >> n;
+
+    int count100 = 0, count200 = 0;
+    int x;
+
+    for (int i = 0; i < n; i++) {
+        cin >> x;
+        if (x == 100) count100++;
+        else count200++;
+    }
+
+    int sum = count100 * 100 + count200 * 200;
+
+    // Nếu tổng khối lượng lẻ thì không chia được
+    if (sum % 200 != 0) {
+        cout << "NO";
+        return 0;
+    }
+
+    int half = sum / 2;
+
+    // Dùng greedy: lấy càng nhiều 200g càng tốt
+    while (count200 > 0 && half >= 200) {
+        half -= 200;
+        count200--;
+    }
+
+    // Dùng 100g để bù phần còn lại
+    if (half <= count100 * 100 && half % 100 == 0)
+        cout << "YES";
+    else
+        cout << "NO";
+
+    return 0;
+}

@@ -1,0 +1,73 @@
+#include <bits/stdc++.h>
+using namespace std;
+typedef long long ll;
+const int MOD = 1000000007;
+
+int main(){
+    ios::sync_with_stdio(false);
+    cin.tie(0);
+    int N;
+    if (!(cin >> N)) return 0;
+
+    if (N == 1) { cout << 1 << "\n"; return 0; }
+    if (N == 2) { cout << 2 << "\n"; return 0; }
+    if (N == 3) { cout << 4 << "\n"; return 0; }
+
+    // Precompute a[k] for k = 0..N-1
+    vector<int> a(N);
+    a[0] = 1;
+    if (N >= 2) a[1] = 1;
+    if (N >= 3) a[2] = 2;
+    for (int k = 3; k <= N-1; ++k) {
+        ll v = ( (ll)a[k-1] + a[k-2] + a[k-3] ) % MOD;
+        a[k] = (int)v;
+    }
+
+    // Sieve primes up to N
+    int limit = N;
+    vector<char> isPrime(limit+1, 1);
+    isPrime.assign(limit+1, 1);
+    isPrime[0] = isPrime[1] = 0;
+    vector<int> primes;
+    for (int i = 2; i <= limit; ++i) {
+        if (isPrime[i]) {
+            primes.push_back(i);
+            if ((ll)i * i <= limit) {
+                for (int j = i*i; j <= limit; j += i) isPrime[j] = 0;
+            }
+        }
+    }
+
+    ll answer = 1;
+
+    // For each prime, compute E = sum_{d = p^m <= N} S(d)
+    for (size_t pi = 0; pi < primes.size(); ++pi) {
+        int p = primes[pi];
+        ll E = 0;
+        // iterate prime powers d = p^m
+        ll d = p;
+        while (d <= N) {
+            // compute S(d) = sum_{j=1..floor(N/d)} a[N - j*d]
+            int q = (int)(N / d);
+            ll Sd = 0;
+            // indices idx = N - d, N - 2d, ..., >=0
+            // careful with types
+            for (int j = 1; j <= q; ++j) {
+                int idx = (int)(N - j * d);
+                // idx is in [0..N-1]
+                Sd += a[idx];
+                if (Sd >= MOD) Sd -= MOD;
+            }
+            E += Sd;
+            E %= MOD;
+            // next power
+            if (d > (ll)N / p) break; // avoid overflow
+            d = d * p;
+        }
+        ll term = (E + 1) % MOD;
+        answer = (answer * term) % MOD;
+    }
+
+    cout << answer % MOD << "\n";
+    return 0;
+}

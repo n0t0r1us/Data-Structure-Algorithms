@@ -1,0 +1,51 @@
+#include <iostream>
+using namespace std;
+
+// Định nghĩa node
+struct Node {
+    int data;
+    Node* next;
+};
+
+// Hàm chèn node vào cuối danh sách
+void insertTail(Node*& head, int value) {
+    Node* newNode = new Node;
+    newNode->data = value;
+    newNode->next = NULL;
+
+    if (head == NULL) {
+        head = newNode; // Danh sách rỗng
+    } else {
+        Node* current = head;
+        while (current->next != NULL) {
+            current = current->next;
+        }
+        current->next = newNode;
+    }
+}
+
+// Hàm in danh sách liên kết
+void printList(Node* head) {
+    Node* current = head;
+    while (current != NULL) {
+        cout << current->data << " ";
+        current = current->next;
+    }
+}
+
+int main() {
+    int n;
+    cin >> n;
+
+    Node* head = NULL;
+
+    for (int i = 0; i < n; ++i) {
+        int value;
+        cin >> value;
+        insertTail(head, value); // Chèn vào cuối
+    }
+
+    printList(head); // In danh sách
+
+    return 0;
+}

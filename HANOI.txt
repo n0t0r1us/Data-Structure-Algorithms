@@ -1,0 +1,39 @@
+#include <iostream>
+#include <stack>
+using namespace std;
+
+int a = 0, b = 0, c = 0;
+int n, k;
+int step = 0;
+
+stack<int> A, B, C;
+
+void move(int num, stack<int>& from, stack<int>& to, stack<int>& aux, char f, char t, char x) {
+    if (num == 0 || step == k) return;
+
+    move(num - 1, from, aux, to, f, x, t);
+    if (step == k) return;
+
+    if (!from.empty()) {
+        to.push(from.top());
+        from.pop();
+    }
+    step++;
+    if (step == k) return;
+
+    move(num - 1, aux, to, from, x, t, f);
+}
+
+int main() {
+    cin >> n >> k;
+
+    for (int i = n; i >= 1; --i) {
+        A.push(i);
+    }
+
+    move(n, A, B, C, 'A', 'B', 'C');
+
+    cout << A.size() << " " << B.size() << " " << C.size() << endl;
+
+    return 0;
+}

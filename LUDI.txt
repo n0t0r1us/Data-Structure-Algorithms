@@ -1,0 +1,32 @@
+#include <iostream>
+#include <vector>
+#include <algorithm>
+using namespace std;
+
+int main() {
+    ios::sync_with_stdio(false);
+    cin.tie(0);
+    int n;
+    if (!(cin >> n)) return 0;
+    vector< pair<long long,long long> > seg;
+    seg.reserve(n);
+    for (int i = 0; i < n; ++i) {
+        long long a,b;
+        cin >> a >> b;
+        seg.push_back(make_pair(b,a)); // store (end,start) to sort by end easily
+    }
+    sort(seg.begin(), seg.end()); // sort by end asc, if tie by start asc
+
+    long long last_end = - (1LL<<62); // very small
+    int cnt = 0;
+    for (int i = 0; i < n; ++i) {
+        long long end = seg[i].first;
+        long long start = seg[i].second;
+        if (start > last_end) {
+            ++cnt;
+            last_end = end;
+        }
+    }
+    cout << cnt << "\n";
+    return 0;
+}

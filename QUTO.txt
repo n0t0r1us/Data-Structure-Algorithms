@@ -1,0 +1,59 @@
+#include <iostream>
+#include <queue>
+#include <cstring>
+using namespace std;
+
+const int H = 10, W = 9;
+int dy[3] = {1, 0, 0}; // tiến, trái, phải
+int dx[3] = {0, -1, 1};
+
+struct State {
+    int y, x, steps, id;
+};
+
+bool visited[5][H][W];
+
+int startY = 3;
+int startX[5] = {0, 2, 4, 6, 8}; // A, B, C, D, E
+
+char name[5] = {'A', 'B', 'C', 'D', 'E'};
+
+int main() {
+    int ty, tx;
+    cin >> ty >> tx;
+
+    memset(visited, 0, sizeof(visited));
+    queue<State> q;
+
+    for (int i = 0; i < 5; i++) {
+        q.push((State){startY, startX[i], 0, i});
+        visited[i][startY][startX[i]] = true;
+    }
+
+    while (!q.empty()) {
+        State cur = q.front(); q.pop();
+        int y = cur.y, x = cur.x, step = cur.steps, id = cur.id;
+
+        if (y == ty && x == tx) {
+            cout << step << endl;
+            cout << name[id] << endl;
+            return 0;
+        }
+
+        for (int d = 0; d < 3; d++) {
+            int ny = y + dy[d];
+            int nx = x + dx[d];
+
+            // Trước khi sang sông (y < 5), chỉ được đi thẳng
+            if (y < 5 && d != 0) continue;
+
+            if (ny >= 0 && ny < H && nx >= 0 && nx < W && !visited[id][ny][nx]) {
+                visited[id][ny][nx] = true;
+                q.push((State){ny, nx, step + 1, id});
+            }
+        }
+    }
+
+    cout << -1 << endl;
+    return 0;
+}

@@ -1,0 +1,28 @@
+#include <iostream>
+#include <fstream>
+#include <cmath>
+
+using namespace std;
+
+bool isPerfectSquare(int n) {
+    int sqrtN = sqrt(n);
+    return (sqrtN * sqrtN == n);
+}
+
+int main() {
+    ifstream inputFile("input.txt");
+    ofstream outputFile("output.txt");
+
+    int a;
+    int countPerfectSquares = 0;
+    while (inputFile >> a) {
+        if (isPerfectSquare(a)) {
+            countPerfectSquares++;
+        }
+    }
+    outputFile << countPerfectSquares;
+    inputFile.close();
+    outputFile.close();
+
+    return 0;
+}

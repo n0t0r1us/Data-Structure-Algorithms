@@ -1,0 +1,67 @@
+#include <iostream>
+#include <string>
+#include <map>
+using namespace std;
+
+string divide(const string &num, int d) {
+    string res = "";
+    int r = 0;
+    for (size_t i = 0; i < num.size(); ++i) {
+        int cur = r * 10 + (num[i] - '0');
+        res += (cur / d) + '0';
+        r = cur % d;
+    }
+    // Xóa số 0 đầu
+    int p = 0;
+    while (p < res.size() && res[p] == '0') ++p;
+    return p == res.size() ? "1" : res.substr(p);
+}
+
+bool divisible(const string &num, int d) {
+    int r = 0;
+    for (size_t i = 0; i < num.size(); ++i) {
+        r = (r * 10 + (num[i] - '0')) % d;
+    }
+    return r == 0;
+}
+
+bool isSuperLucky(string num, int T[4], map<string, bool> &memo) {
+    if (memo.count(num)) return memo[num];
+    string original = num;
+    while (num != "1") {
+        bool changed = false;
+        for (int i = 0; i < 4; ++i) {
+            while (divisible(num, T[i])) {
+                num = divide(num, T[i]);
+                changed = true;
+            }
+        }
+        if (!changed) {
+            memo[original] = false;
+            return false;
+        }
+    }
+    memo[original] = true;
+    return true;
+}
+
+int main() {
+    ios::sync_with_stdio(false);
+    cin.tie(0);
+
+    int T[4];
+    for (int i = 0; i < 4; ++i) cin >> T[i];
+    int n;
+    cin >> n;
+
+    string num;
+    map<string, bool> memo;
+
+    for (int i = 0; i < n; ++i) {
+        cin >> num;
+        if (isSuperLucky(num, T, memo)) cout << "YES\n";
+        else cout << "NO\n";
+    }
+    return 0;
+}
+    

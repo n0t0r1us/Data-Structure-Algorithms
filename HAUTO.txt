@@ -1,0 +1,38 @@
+#include <iostream>
+#include <stack>
+#include <string>
+#include <cstring>  // dùng strtok, strcmp
+#include <cstdlib> // dùng atoi
+
+using namespace std;
+
+int main() {
+    char line[110];
+    cin.getline(line, 110); // đọc dòng biểu thức hậu tố
+
+    stack<int> st;
+    char* token = strtok(line, " ");
+
+    while (token != NULL) {
+        if (strcmp(token, "+") == 0 || strcmp(token, "-") == 0 || strcmp(token, "*") == 0) {
+            int right = st.top(); st.pop();
+            int left = st.top(); st.pop();
+            int result = 0;
+
+            if (strcmp(token, "+") == 0) result = left + right;
+            else if (strcmp(token, "-") == 0) result = left - right;
+            else if (strcmp(token, "*") == 0) result = left * right;
+
+            st.push(result);
+        } else {
+            // Chuyển chuỗi số thành int (sử dụng atoi)
+            st.push(atoi(token));
+        }
+
+        token = strtok(NULL, " ");
+    }
+
+    cout << st.top();
+
+    return 0;
+}

@@ -1,0 +1,32 @@
+#include <iostream>
+#include <vector>
+#include <string>
+using namespace std;
+
+int n, m = 0;
+vector<string> res;
+
+void backtrack(string current, int open, int close) {
+    if (current.length() == n) {
+        res.push_back(current);
+        m++;
+        return;
+    }
+    if (open < n / 2)
+        backtrack(current + '(', open + 1, close);
+    if (close < open)
+        backtrack(current + ')', open, close + 1);
+}
+
+int main() {
+    cin >> n;
+    if (n % 2 != 0 || n < 2 || n > 20) {
+        cout << "0\n";
+        return 0;
+    }
+    backtrack("", 0, 0);
+    for (int i = 0; i < res.size(); ++i)
+        cout << res[i] << endl;
+    cout << m << endl;
+    return 0;
+}

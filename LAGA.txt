@@ -1,0 +1,30 @@
+#include <iostream>
+using namespace std;
+
+const int MOD = 100000000;
+
+int main() {
+    int n;
+    cin >> n;
+    int dp[1001][3] = {}; // 3 trạng thái hợp lệ: 0, 1, 2
+
+    dp[1][0] = dp[1][1] = dp[1][2] = 1;
+
+    for (int i = 2; i <= n; ++i) {
+        for (int prev = 0; prev < 3; ++prev) {
+            for (int curr = 0; curr < 3; ++curr) {
+                // kiểm tra không có 2 ô đen liền nhau giữa prev và curr
+                bool ok = true;
+                if ((prev & 1) && (curr & 1)) ok = false;
+                if ((prev & 2) && (curr & 2)) ok = false;
+                if (ok) {
+                    dp[i][curr] = (dp[i][curr] + dp[i-1][prev]) % MOD;
+                }
+            }
+        }
+    }
+
+    int res = (dp[n][0] + dp[n][1] + dp[n][2]) % MOD;
+    cout << res << endl;
+    return 0;
+}

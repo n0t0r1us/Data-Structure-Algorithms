@@ -1,0 +1,17 @@
+#include <bits/stdc++.h>
+using namespace std;
+
+int main() {
+    ios::sync_with_stdio(false);
+    cin.tie(NULL);
+
+    double r, x, y, xd, yd;
+    cin >> r >> x >> y >> xd >> yd;
+
+    double dx = xd - x;
+    double dy = yd - y;
+    double dist = sqrt(dx * dx + dy * dy);
+
+    int steps = (int)ceil(dist / (2 * r));
+    cout << steps << "\n";
+}

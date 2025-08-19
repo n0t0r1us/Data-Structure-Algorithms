@@ -1,0 +1,36 @@
+#include <iostream>
+#include <vector>
+using namespace std;
+
+const int LIMIT = 10000000; // vì số nguyên tố thứ 600000 < 10^7
+
+int main() {
+    int n;
+    cin >> n;
+
+    vector<bool> is_prime(LIMIT + 1, true);
+    is_prime[0] = is_prime[1] = false;
+
+    // Sàng Eratosthenes
+    for (int i = 2; i * i <= LIMIT; ++i) {
+        if (is_prime[i]) {
+            for (int j = i * i; j <= LIMIT; j += i) {
+                is_prime[j] = false;
+            }
+        }
+    }
+
+    // Duyệt tìm số nguyên tố thứ n
+    int count = 0;
+    for (int i = 2; i <= LIMIT; ++i) {
+        if (is_prime[i]) {
+            count++;
+            if (count == n) {
+                cout << i << endl;
+                break;
+            }
+        }
+    }
+
+    return 0;
+}

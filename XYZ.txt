@@ -1,0 +1,35 @@
+#include <iostream>
+#include <map>
+#include <string>
+using namespace std;
+
+int toSec(const string &time) {
+    int h = (time[0]-'0')*10 + (time[1]-'0');
+    int m = (time[2]-'0')*10 + (time[3]-'0');
+    int s = (time[4]-'0')*10 + (time[5]-'0');
+    return h*3600 + m*60 + s;
+}
+
+int main() {
+    ios::sync_with_stdio(false);
+    cin.tie(0);
+    int n;
+    if (!(cin >> n)) return 0;
+    map<string, long long> score;
+    for (int i = 0; i < n; i++) {
+        string caller, receiver, start, end;
+        cin >> caller >> receiver >> start >> end;
+        int t1 = toSec(start);
+        int t2 = toSec(end);
+        int dur = t2 - t1;
+        if (dur < 0) dur += 24 * 3600;
+        score[caller] += (long long)dur * 2;
+        score[receiver] += dur;
+    }
+    long long ans = 0;
+    for (map<string, long long>::iterator it = score.begin(); it != score.end(); ++it) {
+        if (it->second > ans) ans = it->second;
+    }
+    cout << ans << "\n";
+    return 0;
+}

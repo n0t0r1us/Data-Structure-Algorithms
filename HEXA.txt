@@ -1,0 +1,68 @@
+#include <bits/stdc++.h>
+using namespace std;
+
+const double EPS = 1e-4;
+
+struct Point {
+    double x, y;
+};
+
+double cx, cy;
+double ang[6];
+Point p[6];
+
+double dist2(Point a, Point b) {
+    double dx = a.x - b.x;
+    double dy = a.y - b.y;
+    return dx * dx + dy * dy;
+}
+
+bool cmp_idx(int a, int b) {
+    return ang[a] < ang[b];
+}
+
+int main() {
+    ios::sync_with_stdio(false);
+    cin.tie(0);
+
+    for (int i = 0; i < 6; i++) cin >> p[i].x >> p[i].y;
+
+    // Tính tâm
+    cx = cy = 0;
+    for (int i = 0; i < 6; i++) {
+        cx += p[i].x;
+        cy += p[i].y;
+    }
+    cx /= 6.0;
+    cy /= 6.0;
+
+    // Kiểm tra bán kính từ tâm đến các đỉnh
+    double r2 = dist2(p[0], (Point){cx, cy});
+    for (int i = 0; i < 6; i++) {
+        double d2 = dist2(p[i], (Point){cx, cy});
+        if (fabs(d2 - r2) > EPS) {
+            cout << "NO\n";
+            return 0;
+        }
+        ang[i] = atan2(p[i].y - cy, p[i].x - cx);
+    }
+
+    // Sắp xếp các đỉnh theo góc
+    int idx[6];
+    for (int i = 0; i < 6; i++) idx[i] = i;
+    sort(idx, idx + 6, cmp_idx);
+
+    // Kiểm tra độ dài cạnh
+    double side2 = dist2(p[idx[0]], p[idx[1]]);
+    for (int i = 0; i < 6; i++) {
+        int j = (i + 1) % 6;
+        double d2 = dist2(p[idx[i]], p[idx[j]]);
+        if (fabs(d2 - side2) > EPS) {
+            cout << "NO\n";
+            return 0;
+        }
+    }
+
+    cout << "YES\n";
+    return 0;
+}

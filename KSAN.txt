@@ -1,0 +1,45 @@
+#include <iostream>
+#include <algorithm>
+using namespace std;
+
+const int MAXN = 100005;
+int start[MAXN], endTime[MAXN];
+
+int main() {
+    int n;
+    cin >> n;
+    int Ti, Di;
+
+    // Nhập thời điểm đến
+    for (int i = 0; i < n; ++i) {
+        cin >> start[i];
+    }
+
+    // Nhập thời gian thuê và tính thời điểm rời đi
+    for (int i = 0; i < n; ++i) {
+        cin >> Di;
+        endTime[i] = start[i] + Di;
+    }
+
+    // Sắp xếp thời điểm đến và rời đi
+    sort(start, start + n);
+    sort(endTime, endTime + n);
+
+    int res = 0;  // Số phòng tối đa cần thiết
+    int cnt = 0;  // Số phòng đang sử dụng
+    int i = 0, j = 0;
+
+    while (i < n) {
+        if (start[i] < endTime[j]) {
+            cnt++; // khách mới đến
+            res = max(res, cnt);
+            i++;
+        } else {
+            cnt--; // khách rời đi
+            j++;
+        }
+    }
+
+    cout << res << endl;
+    return 0;
+}

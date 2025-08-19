@@ -1,0 +1,82 @@
+#include <bits/stdc++.h>
+using namespace std;
+typedef long long ll;
+const ll INF = (1LL<<60);
+
+struct Edge {
+    int to;
+    int w;
+    Edge(int _to=0,int _w=0):to(_to),w(_w){}
+};
+
+vector< vector<Edge> > graph_car, graph_walk;
+vector< vector<Edge> > graph_car_rev, graph_walk_rev;
+int N,M,K;
+
+vector<ll> dijkstra(int src, const vector< vector<Edge> > &g) {
+    vector<ll> dist(N+1, INF);
+    typedef pair<ll,int> pli;
+    priority_queue< pli, vector<pli>, greater<pli> > pq;
+    dist[src] = 0;
+    pq.push(make_pair(0, src));
+    while (!pq.empty()) {
+        pli cur = pq.top(); pq.pop();
+        ll d = cur.first;
+        int u = cur.second;
+        if (d != dist[u]) continue;
+        for (size_t i = 0; i < g[u].size(); ++i) {
+            int v = g[u][i].to;
+            ll w = g[u][i].w;
+            if (dist[v] > d + w) {
+                dist[v] = d + w;
+                pq.push(make_pair(dist[v], v));
+            }
+        }
+    }
+    return dist;
+}
+
+int main(){
+    ios::sync_with_stdio(false);
+    cin.tie(0);
+    if (!(cin >> N >> M >> K)) return 0;
+    graph_car.assign(N+1, vector<Edge>());
+    graph_walk.assign(N+1, vector<Edge>());
+    graph_car_rev.assign(N+1, vector<Edge>());
+    graph_walk_rev.assign(N+1, vector<Edge>());
+    for (int e = 0; e < M; ++e) {
+        int i,j; int aij, bij;
+        cin >> i >> j >> aij >> bij;
+        // walking edge weight aij from i->j
+        graph_walk[i].push_back(Edge(j, aij));
+        graph_walk_rev[j].push_back(Edge(i, aij)); // reverse for walk-to-K
+        // car edge weight bij
+        graph_car[i].push_back(Edge(j, bij));
+        graph_car_rev[j].push_back(Edge(i, bij)); // reverse for car-to-N
+    }
+
+    // car_from1: shortest car time from 1 to all
+    vector<ll> car_from1 = dijkstra(1, graph_car);
+    // car_toN: shortest car time from v to N  => run on reversed car graph from N
+    vector<ll> car_toN = dijkstra(N, graph_car_rev);
+    // walk_toK: shortest walk time from v to K => run on reversed walk graph from K
+    vector<ll> walk_toK = dijkstra(K, graph_walk_rev);
+
+    ll best = INF;
+    for (int v = 1; v <= N; ++v) {
+        if (car_from1[v] >= INF) continue;
+        if (walk_toK[v] >= INF) continue;
+        // son's arrival time if dropped at v
+        ll son_time = car_from1[v] + walk_toK[v];
+        if (son_time <= 59) {
+            if (car_toN[v] >= INF) continue;
+            ll mother_time = car_from1[v] + car_toN[v];
+            if (mother_time < best) best = mother_time;
+        }
+    }
+
+    // Problem statement guarantees a solution exists
+    if (best >= INF) best = -1; // just in case
+    cout << best << "\n";
+    return 0;
+}

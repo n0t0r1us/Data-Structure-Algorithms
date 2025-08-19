@@ -1,0 +1,25 @@
+#include <iostream>
+#include <string>
+using namespace std;
+
+int main() {
+    string s;
+    if (!(cin >> s)) return 0;
+
+    bool all_zero = true;
+    int mod = 0;
+    for (size_t i = 0; i < s.size(); ++i) {
+        char c = s[i];
+        if (c < '0' || c > '9') continue; // phòng trường hợp có kí tự lạ (không bắt buộc)
+        if (c != '0') all_zero = false;
+        mod = (mod + (c - '0')) % 9;
+    }
+
+    if (all_zero) {
+        cout << 0 << '\n';
+    } else {
+        if (mod == 0) cout << 9 << '\n';
+        else cout << mod << '\n';
+    }
+    return 0;
+}

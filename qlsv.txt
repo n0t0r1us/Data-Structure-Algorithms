@@ -1,0 +1,109 @@
+#include <iostream>
+#include <cstring>
+using namespace std;
+
+struct SinhVien {
+    char ma[9];
+    char ten[21];
+    float toan, ly, hoa;
+};
+
+struct Node {
+    SinhVien data;
+    Node* next;
+};
+
+// Tạo nút mới
+Node* MakeNode(SinhVien sv) {
+    Node* p = new Node;
+    p->data = sv;
+    p->next = NULL;
+    return p;
+}
+
+// Thêm sinh viên vào cuối danh sách
+void InsertLast(Node*& head, SinhVien sv) {
+    Node* p = MakeNode(sv);
+    if (head == NULL) head = p;
+    else {
+        Node* temp = head;
+        while (temp->next != NULL)
+            temp = temp->next;
+        temp->next = p;
+    }
+}
+
+// Tính điểm trung bình
+float DTB(SinhVien sv) {
+    return (sv.toan + sv.ly + sv.hoa) / 3.0;
+}
+
+// In thông tin một sinh viên
+void PrintSinhVien(SinhVien sv) {
+    cout << sv.ma << " " << sv.ten << " ";
+    cout << sv.toan << " " << sv.ly << " " << sv.hoa << " ";
+    cout << DTB(sv) << endl;
+}
+
+// In ra các sinh viên có ĐTB >= 5
+void PrintSinhVienDat(Node* head) {
+    Node* p = head;
+    while (p != NULL) {
+        if (DTB(p->data) >= 5.0)
+            PrintSinhVien(p->data);
+        p = p->next;
+    }
+}
+
+// Xóa sinh viên theo mã
+void XoaSinhVien(Node*& head, const char* ma) {
+    Node* prev = NULL;
+    Node* curr = head;
+
+    while (curr != NULL) {
+        if (strcmp(curr->data.ma, ma) == 0) {
+            if (prev == NULL) head = curr->next;
+            else prev->next = curr->next;
+
+            cout << "Thong tin sinh vien can xoa: ";
+            PrintSinhVien(curr->data);
+            delete curr;
+            return;
+        }
+        prev = curr;
+        curr = curr->next;
+    }
+    cout << "Khong tim thay sinh vien co ma: " << ma << endl;
+}
+
+// Hàm nhập thông tin sinh viên
+SinhVien NhapSV() {
+    SinhVien sv;
+    cin >> sv.ma;
+    cin.ignore();
+    cin.getline(sv.ten, 21);
+    cin >> sv.toan >> sv.ly >> sv.hoa;
+    return sv;
+}
+
+int main() {
+    Node* head = NULL;
+    int n;
+    cin >> n;
+
+    // Nhập danh sách sinh viên
+    for (int i = 0; i < n; i++) {
+        SinhVien sv = NhapSV();
+        InsertLast(head, sv);
+    }
+
+    // In các sinh viên có ĐTB >= 5
+    PrintSinhVienDat(head);
+
+    // Nhập mã sinh viên để xóa
+    char maXoa[9];
+    cin >> maXoa;
+    XoaSinhVien(head, maXoa);
+
+    return 0;
+}

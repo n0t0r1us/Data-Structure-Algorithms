@@ -1,0 +1,49 @@
+#include <iostream>
+#include <vector>
+#include <algorithm>
+#include <queue>
+
+using namespace std;
+
+struct Problem {
+    int a, b;
+};
+
+bool compare(Problem x, Problem y) {
+    return x.a < y.a;
+}
+
+int main() {
+    ios::sync_with_stdio(false);
+    cin.tie(0);
+
+    int n;
+    long long c;
+    cin >> n >> c;
+
+    vector<Problem> problems(n);
+    for (int i = 0; i < n; ++i)
+        cin >> problems[i].a >> problems[i].b;
+
+    sort(problems.begin(), problems.end(), compare);
+
+    priority_queue<int> pq;
+    int i = 0, solved = 0;
+
+    while (true) {
+        while (i < n && problems[i].a <= c) {
+            pq.push(problems[i].b);
+            ++i;
+        }
+
+        if (pq.empty()) break;
+
+        c += pq.top();
+        pq.pop();
+        solved++;
+    }
+
+    cout << solved << "\n";
+    return 0;
+}
+    

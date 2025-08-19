@@ -1,0 +1,56 @@
+#include <bits/stdc++.h>
+using namespace std;
+#define INF 2000000000
+
+int main() {
+    ios::sync_with_stdio(false);
+    cin.tie(NULL);
+    int n, m;
+    cin >> n >> m;
+    vector<int> U(m), V(n);
+    for (int i = 0; i < m; i++) cin >> U[i];
+    for (int i = 0; i < n; i++) cin >> V[i];
+
+    // Thông tin mẫu
+    int uminVal = INF, umaxVal = -INF;
+    int uminPos = -1, umaxPos = -1;
+    for (int i = 0; i < m; i++) {
+        if (U[i] < uminVal) { uminVal = U[i]; uminPos = i; }
+        if (U[i] > umaxVal) { umaxVal = U[i]; umaxPos = i; }
+    }
+    int udiff = U[0] - U[m-1];
+    int usign = (udiff > 0 ? 1 : (udiff < 0 ? -1 : 0));
+
+    // Hàm sliding window min/max index
+    deque<int> dqmin, dqmax;
+    vector<int> minPos(n), maxPos(n);
+    for (int i = 0; i < n; i++) {
+        // min
+        while (!dqmin.empty() && V[dqmin.back()] >= V[i]) dqmin.pop_back();
+        dqmin.push_back(i);
+        if (dqmin.front() <= i - m) dqmin.pop_front();
+        // max
+        while (!dqmax.empty() && V[dqmax.back()] <= V[i]) dqmax.pop_back();
+        dqmax.push_back(i);
+        if (dqmax.front() <= i - m) dqmax.pop_front();
+        // lưu vị trí min/max trong cửa sổ bắt đầu tại i-m+1
+        if (i >= m-1) {
+            int start = i - m + 1;
+            minPos[start] = dqmin.front() - start;
+            maxPos[start] = dqmax.front() - start;
+        }
+    }
+
+    // Đếm
+    int ans = 0;
+    for (int start = 0; start <= n - m; start++) {
+        if (minPos[start] != uminPos) continue;
+        if (maxPos[start] != umaxPos) continue;
+        int diff = V[start] - V[start + m - 1];
+        int sign = (diff > 0 ? 1 : (diff < 0 ? -1 : 0));
+        if (sign != usign) continue;
+        ans++;
+    }
+    cout << ans << "\n";
+    return 0;
+}

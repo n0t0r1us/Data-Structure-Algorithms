@@ -1,0 +1,27 @@
+#include <iostream>
+using namespace std;
+
+int main() {
+    int n, m;
+    cin >> n >> m;
+
+    int k = min(n, m);
+    while (3 * k > n + m) k--; // phải đủ 3 hoa cho mỗi người
+
+    cout << k << endl;
+
+    // Tặng k bó hoa
+    for (int i = 0; i < k; i++) {
+        if (n > m) {
+            // Nếu hoa hồng nhiều hơn, tặng 2 hồng + 1 cúc
+            cout << 2 << " " << 1 << endl;
+            n -= 2; m -= 1;
+        } else {
+            // Ngược lại, tặng 1 hồng + 2 cúc
+            cout << 1 << " " << 2 << endl;
+            n -= 1; m -= 2;
+        }
+    }
+
+    return 0;
+}

@@ -1,0 +1,20 @@
+#include <iostream>
+#include <cmath>
+using namespace std;
+
+int main() {
+    double a, b;
+    cin >> a >> b;
+
+    long long start = ceil(a);
+    long long end = floor(b);
+
+    if (start > end) {
+        cout << 0;
+        return 0;
+    }
+
+    long long sum = (end - start + 1) * (start + end) / 2;
+    cout << sum;
+    return 0;
+}

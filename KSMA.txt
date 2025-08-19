@@ -1,0 +1,50 @@
+#include <iostream>
+#include <queue>
+#include <vector>
+#include <algorithm>
+using namespace std;
+
+int main() {
+    ios::sync_with_stdio(false);
+    cin.tie(0);
+
+    long long N;
+    int K;
+    long long S, C1, C2, M;
+    if (!(cin >> N >> K >> S >> C1 >> C2 >> M)) return 0;
+
+    priority_queue<int> pq; // max-heap of current K smallest
+    long long prev = S;
+    // process A1
+    if (K > 0) {
+        pq.push((int)prev);
+    }
+    // process Ai for i = 2..N
+    for (long long i = 2; i <= N; ++i) {
+        long long cur = ( (C1 * prev) + C2 ) % M;
+        int val = (int)cur;
+        if ((int)pq.size() < K) {
+            pq.push(val);
+        } else if (K > 0 && val < pq.top()) {
+            pq.pop();
+            pq.push(val);
+        }
+        prev = cur;
+    }
+
+    // Extract results and sort ascending
+    vector<int> res;
+    while (!pq.empty()) {
+        res.push_back(pq.top());
+        pq.pop();
+    }
+    sort(res.begin(), res.end());
+
+    // Print K numbers in increasing order
+    for (size_t i = 0; i < res.size(); ++i) {
+        if (i) cout << ' ';
+        cout << res[i];
+    }
+    cout << '\n';
+    return 0;
+}

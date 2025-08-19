@@ -1,0 +1,47 @@
+#include <iostream>
+#include <vector>
+#include <set>
+using namespace std;
+
+int main() {
+    ios::sync_with_stdio(false);
+    cin.tie(0);
+
+    int N, M, K;
+    cin >> N >> M >> K;
+    vector<vector<int> > a(N+1, vector<int>(M+1, 0));
+    for (int i = 1; i <= N; i++) {
+        for (int j = 1; j <= M; j++) {
+            cin >> a[i][j];
+        }
+    }
+
+    // Prefix sum 2D
+    vector<vector<long long> > pre(N+1, vector<long long>(M+1, 0));
+    for (int i = 1; i <= N; i++) {
+        for (int j = 1; j <= M; j++) {
+            pre[i][j] = a[i][j] + pre[i-1][j] + pre[i][j-1] - pre[i-1][j-1];
+        }
+    }
+
+    set<long long> possible;
+    for (int i = 1; i <= N; i++) {
+        for (int j = 1; j <= M; j++) {
+            int r1 = i - 1; if (r1 < 1) r1 = 1;
+            int c1 = j - 1; if (c1 < 1) c1 = 1;
+            int r2 = i + 1; if (r2 > N) r2 = N;
+            int c2 = j + 1; if (c2 > M) c2 = M;
+            long long sum9 = pre[r2][c2] - pre[r1-1][c2] - pre[r2][c1-1] + pre[r1-1][c1-1];
+            long long sum8 = sum9 - a[i][j];
+            possible.insert(sum8);
+        }
+    }
+
+    while (K--) {
+        long long need;
+        cin >> need;
+        if (possible.count(need)) cout << 1 << "\n";
+        else cout << 0 << "\n";
+    }
+    return 0;
+}

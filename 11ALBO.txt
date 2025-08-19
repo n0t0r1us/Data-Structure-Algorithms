@@ -1,0 +1,23 @@
+#include <bits/stdc++.h>
+using namespace std;
+
+int n, k;
+
+int main(){
+    //freopen("albo.inp", "r", stdin);
+    //freopen("albo.out", "w", stdout);
+    cin >> n >> k;
+    if (k == 1){
+        if ( n % 2 == 0) cout << "Bob will win"; else cout << "Alice will win";
+    }else if (n%k == 0) cout << "Alice will win";
+    else if (n <= k) cout << "Alice will win";
+        else if (n%k == 1){
+            if ((n-1)% (2*k) != 0) cout << "Bob will win";
+            else cout << "Alice will win";
+        }else if (n%k > 1){
+            if ((n-(n%k))% (2*k) != 0) cout << "Alice will win";
+            else cout << "Bob will win";
+        }
+
+    return 0;
+}

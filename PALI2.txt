@@ -1,0 +1,56 @@
+#include <iostream>
+#include <string>
+#include <vector>
+#include <climits>
+using namespace std;
+
+int main() {
+    int n;
+    string s;
+    cin >> n >> s;
+
+    vector<vector<bool> > is_pal(n, vector<bool>(n, false));
+    vector<int> dp(n + 1, INT_MAX);
+    vector<int> prev(n + 1, -1);
+    dp[0] = 0;
+
+    // Tiền xử lý is_pal[i][j]
+    for (int len = 1; len <= n; ++len) {
+        for (int i = 0; i + len - 1 < n; ++i) {
+            int j = i + len - 1;
+            if (s[i] == s[j]) {
+                if (len <= 2) is_pal[i][j] = true;
+                else is_pal[i][j] = is_pal[i + 1][j - 1];
+            }
+        }
+    }
+
+    // Tính dp[i]
+    for (int i = 0; i < n; ++i) {
+        for (int j = i; j < n; ++j) {
+            if (is_pal[i][j]) {
+                if (dp[i] + 1 < dp[j + 1]) {
+                    dp[j + 1] = dp[i] + 1;
+                    prev[j + 1] = i;
+                }
+            }
+        }
+    }
+
+    // Truy vết kết quả
+    vector<string> result;
+    int idx = n;
+    while (idx > 0) {
+        int j = prev[idx];
+        result.push_back(s.substr(j, idx - j));
+        idx = j;
+    }
+
+    // In kết quả
+    cout << result.size() << endl;
+    for (int i = result.size() - 1; i >= 0; --i) {
+        cout << result[i] << endl;
+    }
+
+    return 0;
+}

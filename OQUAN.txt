@@ -1,0 +1,21 @@
+#include <bits/stdc++.h>
+using namespace std;
+
+int main() {
+    ios::sync_with_stdio(false);
+    cin.tie(NULL);
+    int n, k;
+    cin >> n >> k;
+    vector<long long> a(n);
+    for (int i = 0; i < n; i++) cin >> a[i];
+    k--;
+    long long stones = a[k];
+    a[k] = 0;
+    long long add_all = stones / n;
+    long long rem = stones % n;
+    for (int i = 0; i < n; i++) a[i] += add_all;
+    for (int i = 1; i <= rem; i++) {
+        a[(k + i) % n]++;
+    }
+    for (int i = 0; i < n; i++) cout << a[i] << " ";
+}

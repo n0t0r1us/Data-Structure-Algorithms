@@ -1,0 +1,51 @@
+#include <iostream>
+#include <vector>
+#include <map>
+using namespace std;
+
+int main() {
+    ios::sync_with_stdio(false);
+    cin.tie(0);
+
+    int t, m;
+    cin >> t >> m;
+
+    int nguyen = t / m;
+    int du = t % m;
+
+    cout << nguyen << ".";
+
+    if (du == 0) {
+        cout << "0\n";
+        return 0;
+    }
+
+    vector<int> digits; // các chữ số thập phân
+    map<int, int> pos;  // lưu vị trí xuất hiện của số dư
+    int startRepeat = -1;
+
+    while (du != 0) {
+        if (pos.count(du)) {
+            startRepeat = pos[du];
+            break;
+        }
+        pos[du] = digits.size();
+        du *= 10;
+        digits.push_back(du / m);
+        du %= m;
+    }
+
+    // In kết quả
+    if (startRepeat == -1) {
+        // Hữu hạn
+        for (size_t i = 0; i < digits.size(); i++) cout << digits[i];
+    } else {
+        for (int i = 0; i < startRepeat; i++) cout << digits[i];
+        cout << "(";
+        for (size_t i = startRepeat; i < digits.size(); i++) cout << digits[i];
+        cout << ")";
+    }
+    cout << "\n";
+
+    return 0;
+}

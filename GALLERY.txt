@@ -1,0 +1,73 @@
+#include <iostream>
+#include <vector>
+#include <algorithm>
+using namespace std;
+const int NEG = -1000000000;
+
+int main() {
+    ios::sync_with_stdio(false);
+    cin.tie(0);
+    int N, k;
+    if (!(cin >> N >> k)) return 0;
+
+    // Dùng mảng 2 phần tử thay cho std::array
+    int v[205][2];
+    for (int i = 1; i <= N; ++i) {
+        cin >> v[i][0] >> v[i][1]; // column1, column2
+    }
+
+    vector< vector< vector<int> > > dp(N+1, vector< vector<int> >(k+1, vector<int>(4, NEG)));
+
+    // Khởi tạo hàng 1
+    for (int open_mask = 0; open_mask < 4; ++open_mask) {
+        int closed_here = 2 - ( (open_mask&1) + ((open_mask>>1)&1) );
+        if (closed_here > k) continue;
+        int sum_open = 0;
+        if (open_mask & 1) sum_open += v[1][0];
+        if (open_mask & 2) sum_open += v[1][1];
+        for (int start = 0; start < 2; ++start) {
+            if (!(open_mask & (1<<start))) continue;
+            int reach_mask;
+            if (open_mask == 3) reach_mask = 3;
+            else reach_mask = (1<<start);
+            int closed_used = closed_here;
+            if (dp[1][closed_used][reach_mask] < sum_open)
+                dp[1][closed_used][reach_mask] = sum_open;
+        }
+    }
+
+    // Xử lý các hàng còn lại
+    for (int i = 2; i <= N; ++i) {
+        for (int used = 0; used <= k; ++used) {
+            for (int prev_r = 0; prev_r < 4; ++prev_r) {
+                int prevVal = dp[i-1][used][prev_r];
+                if (prevVal == NEG) continue;
+                for (int open_mask = 0; open_mask < 4; ++open_mask) {
+                    int closed_here = 2 - ( (open_mask&1) + ((open_mask>>1)&1) );
+                    if (used + closed_here > k) continue;
+                    int sum_open = 0;
+                    if (open_mask & 1) sum_open += v[i][0];
+                    if (open_mask & 2) sum_open += v[i][1];
+                    int down_reach = prev_r & open_mask;
+                    int new_reach = 0;
+                    if (down_reach != 0) {
+                        if (open_mask == 3) new_reach = 3;
+                        else new_reach = down_reach;
+                    }
+                    int new_used = used + closed_here;
+                    if (dp[i][new_used][new_reach] < prevVal + sum_open) {
+                        dp[i][new_used][new_reach] = prevVal + sum_open;
+                    }
+                }
+            }
+        }
+    }
+
+    int ans = NEG;
+    for (int r = 1; r < 4; ++r) {
+        if (dp[N][k][r] > ans) ans = dp[N][k][r];
+    }
+    if (ans < 0) ans = 0;
+    cout << ans << "\n";
+    return 0;
+}

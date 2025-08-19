@@ -1,0 +1,16 @@
+#include <bits/stdc++.h>
+using namespace std;
+
+int main() {
+    ios::sync_with_stdio(false);
+    cin.tie(NULL);
+    long long r;
+    cin >> r;
+    long long cnt = 0;
+    for (long long x = -r; x <= r; x++) {
+        long long y_max = floor(sqrt((long double)r*r - (long double)x*x));
+        cnt += (y_max * 2 + 1);
+    }
+    cout << cnt;
+    return 0;
+}

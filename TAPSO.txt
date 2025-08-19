@@ -1,0 +1,32 @@
+#include <iostream>
+#include <set>
+#include <string>
+using namespace std;
+
+int main() {
+    string s;
+    cin >> s;
+    set<string> st;
+    int len = s.size();
+    for (int i = 0; i < len; i++) {
+        for (int j = i; j < len; j++) {
+            string sub = s.substr(0, i) + s.substr(j + 1);
+            if (sub.empty()) continue;
+            int pos = 0;
+            while (pos < (int)sub.size() - 1 && sub[pos] == '0') pos++;
+            sub = sub.substr(pos);
+            st.insert(sub);
+        }
+    }
+    st.insert(s);
+    int cnt = 0;
+    for (set<string>::iterator it = st.begin(); it != st.end(); ++it) {
+        string num = *it;
+        int sum = 0;
+        for (int k = 0; k < (int)num.size(); k++)
+            sum += num[k] - '0';
+        if (sum % 3 == 0) cnt++;
+    }
+    cout << cnt << endl;
+    return 0;
+}

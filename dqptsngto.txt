@@ -1,0 +1,20 @@
+#include <iostream>
+using namespace std;
+
+void primeFactors(int n, int i = 2) {
+    if (n == 1) return;
+    if (n % i == 0) {
+        cout << i << " ";
+        primeFactors(n / i, i);
+    } else {
+        primeFactors(n, i + 1);
+    }
+}
+
+int main() {
+    int n;
+    cin >> n;
+    if (n <= 0) return 0;
+    primeFactors(n);
+    return 0;
+}

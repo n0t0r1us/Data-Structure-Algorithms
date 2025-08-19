@@ -1,0 +1,39 @@
+#include <iostream>
+#include <cmath>
+#include <iomanip>
+int findGCD(int a, int b) {
+    while (b != 0) {
+        int temp = b;
+        b = a % b;
+        a = temp;
+    }
+    return a;
+}
+void simplifyFraction(int &numerator, int &denominator) {
+    int gcd = findGCD(numerator, denominator);
+    numerator /= gcd;
+    denominator /= gcd;
+}
+
+int main() {
+    int n;
+    std::cin >> n;
+
+    int numerators[100];
+    int denominators[100];
+    for (int i = 0; i < n; ++i) {
+        std::cin >> numerators[i] >> denominators[i];
+        simplifyFraction(numerators[i], denominators[i]);
+    }
+    for (int i = 0; i < n; ++i) {
+        std::cout << numerators[i] << "/" << denominators[i] << " ";
+    }
+    std::cout << std::endl;
+    std::cout << std::fixed << std::setprecision(2);
+    for (int i = 0; i < n; ++i) {
+        double result = static_cast<double>(numerators[i]) / denominators[i];
+        std::cout << result << " ";
+    }
+
+    return 0;
+}

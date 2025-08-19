@@ -1,0 +1,46 @@
+#include <iostream>
+#include <vector>
+using namespace std;
+
+int main() {
+    int N, M;
+    cin >> N >> M;
+
+    vector<int> W(N), V(N);
+    for (int i = 0; i < N; ++i) {
+        cin >> W[i] >> V[i];
+    }
+
+    int best_value = 0;
+    vector<int> best_items;
+
+    // Duyệt tất cả các tập con
+    for (int mask = 0; mask < (1 << N); ++mask) {
+        int total_weight = 0, total_value = 0;
+        vector<int> items;
+
+        for (int i = 0; i < N; ++i) {
+            if (mask & (1 << i)) {
+                total_weight += W[i];
+                total_value += V[i];
+                items.push_back(i + 1); // +1 vì chỉ số bắt đầu từ 1
+            }
+        }
+
+        if (total_weight <= M && total_value > best_value) {
+            best_value = total_value;
+            best_items = items;
+        }
+    }
+
+    if (best_value == 0) {
+        cout << 0 << endl;
+    } else {
+        cout << best_value << endl;
+        for (int i = best_items.size() - 1; i >= 0; --i) {
+            cout << best_items[i] << (i > 0 ? ' ' : '\n');
+        }
+    }
+
+    return 0;
+}

@@ -1,0 +1,56 @@
+#include <bits/stdc++.h>
+using namespace std;
+typedef long long ll;
+
+struct Fenwick {
+    vector<ll> bit;
+    int n;
+    Fenwick(int n) {
+        this->n = n;
+        bit.assign(n + 1, 0);
+    }
+    void update(int idx, ll delta) {
+        for (idx++; idx <= n; idx += idx & -idx)
+            bit[idx] += delta;
+    }
+    ll query(int idx) {
+        ll res = 0;
+        for (idx++; idx > 0; idx -= idx & -idx)
+            res += bit[idx];
+        return res;
+    }
+    ll query(int l, int r) {
+        return query(r) - (l ? query(l - 1) : 0);
+    }
+};
+
+int main() {
+    ios::sync_with_stdio(false);
+    cin.tie(NULL);
+
+    int N, Q;
+    cin >> N >> Q;
+    vector<ll> A(N);
+    for (int i = 0; i < N; i++) cin >> A[i];
+
+    Fenwick fw(N);
+    for (int i = 0; i < N; i++) fw.update(i, A[i]);
+
+    for (int q = 0; q < Q; q++) {
+        char type;
+        int i, j;
+        ll p;
+        cin >> type;
+        if (type == 'S') {
+            cin >> i >> j;
+            cout << fw.query(i, j) << "\n";
+        } else if (type == 'U') {
+            cin >> i >> p;
+            fw.update(i, p);
+        } else if (type == 'V') {
+            cin >> i >> p;
+            fw.update(i, -p);
+        }
+    }
+    return 0;
+}

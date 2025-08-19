@@ -1,0 +1,29 @@
+#include <bits/stdc++.h>
+using namespace std;
+#define foru(i,a,b) for(int i=a; i<=b; i++)
+#define ford(i,a,b) for(int i=a; i>=b; i--)
+#define reset(a,b) memset(a,b,sizeof(a))
+long long n,k,sum=0,a[100009],luu=0;
+int main()
+{
+    cin>>n>>k;
+    for(int i=1;i<=n;i++)
+        cin>>a[i];
+    for(int i=1;i<=n+1;i++)
+    {
+        luu=a[i-1];
+        luu=min(luu,k);
+        if(a[i]+luu<k)
+        {
+            sum+=a[i]+luu;
+            a[i]=0;
+        }
+        else
+        {
+            a[i]-=(k-luu);
+            sum+=k;
+        }
+    }
+    cout<<sum;
+    return 0;
+}

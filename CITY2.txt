@@ -1,0 +1,45 @@
+#include <iostream>
+#include <vector>
+#include <algorithm>
+using namespace std;
+
+int main() {
+    ios::sync_with_stdio(false);
+    cin.tie(0);
+    int N, M, K;
+    if (!(cin >> N >> M >> K)) return 0;
+    vector< vector<int> > a(N, vector<int>(M));
+    for (int i = 0; i < N; ++i)
+        for (int j = 0; j < M; ++j)
+            cin >> a[i][j];
+
+    vector<int> q(K);
+    int Cmax = 0;
+    for (int i = 0; i < K; ++i) {
+        cin >> q[i];
+        if (q[i] > Cmax) Cmax = q[i];
+    }
+
+    vector<char> possible(Cmax + 1, 0);
+
+    // 8 directions
+    int dy[8] = {-1,-1,-1, 0, 0, 1, 1, 1};
+    int dx[8] = {-1, 0, 1,-1, 1,-1, 0, 1};
+
+    for (int i = 0; i < N; ++i) {
+        for (int j = 0; j < M; ++j) {
+            long long s = 0;
+            for (int d = 0; d < 8; ++d) {
+                int ni = i + dy[d], nj = j + dx[d];
+                if (ni >= 0 && ni < N && nj >= 0 && nj < M) s += a[ni][nj];
+            }
+            if (s <= Cmax) possible[(int)s] = 1;
+        }
+    }
+
+    for (int i = 0; i < K; ++i) {
+        int c = q[i];
+        cout << (possible[c] ? 1 : 0) << '\n';
+    }
+    return 0;
+}

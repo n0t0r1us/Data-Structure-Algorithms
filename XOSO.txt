@@ -1,0 +1,25 @@
+#include <bits/stdc++.h>
+using namespace std;
+
+long long int a, n, anschan, ansle, chan, le, fn;
+
+int main(){
+    ios_base::sync_with_stdio(0);
+    cin.tie(0); cout.tie(0);
+    //freopen("xoso.inp", "r", stdin);
+    //freopen("xoso.out", "w", stdout);
+    cin >> n;
+    for (int i = 1; i <= n; i++){
+        cin >> a;
+        if (!(a%2)) chan++; else le++;
+        fn = (fn+a)%2;
+    }
+    if (fn) cout << chan*le; else{
+        for (int i = 1; i < chan; i++) anschan += i;
+        for (int i = 1; i < le; i++) ansle += i;
+        cout << anschan + ansle;
+    }
+    //cout << " " << fn;
+
+    return 0;
+}

@@ -1,0 +1,31 @@
+#include <iostream>
+#include <vector>
+#include <string>
+using namespace std;
+
+int main() {
+    int k;
+    if (!(cin >> k)) return 0;
+    vector<string> all;
+    all.push_back("1210");
+    all.push_back("2020");
+    all.push_back("21200");
+    all.push_back("3211000");
+    all.push_back("42101000");
+    all.push_back("521001000");
+    all.push_back("6210001000");
+
+    bool found = false;
+    bool first = true;
+    for (size_t i = 0; i < all.size(); ++i) {
+        if ((int)all[i].size() == k) {
+            if (!first) cout << " ";
+            cout << all[i];
+            first = false;
+            found = true;
+        }
+    }
+    if (!found) cout << -1;
+    cout << '\n';
+    return 0;
+}

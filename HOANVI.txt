@@ -1,0 +1,88 @@
+#include <iostream>
+#include <string>
+#include <vector>
+using namespace std;
+
+string s;
+int L;
+int N;
+bool used[55];
+vector<int> ans;
+bool found = false;
+
+void dfs(int pos, int usedCount) {
+    if (found) return;
+    if (pos == L) {
+        if (usedCount == N) {
+            // found solution
+            found = true;
+        }
+        return;
+    }
+    if (usedCount >= N) return; // no more numbers allowed but string not finished
+
+    // try 1-digit
+    if (pos + 1 <= L) {
+        if (s[pos] != '0') { // leading zero forbidden
+            int x = s[pos] - '0';
+            if (1 <= x && x <= N && !used[x]) {
+                used[x] = true;
+                ans.push_back(x);
+                dfs(pos + 1, usedCount + 1);
+                if (found) return;
+                ans.pop_back();
+                used[x] = false;
+            }
+        }
+    }
+    // try 2-digit (only if enough chars)
+    if (pos + 2 <= L) {
+        if (s[pos] != '0') {
+            int x = (s[pos] - '0') * 10 + (s[pos+1] - '0');
+            if (1 <= x && x <= N && !used[x]) {
+                used[x] = true;
+                ans.push_back(x);
+                dfs(pos + 2, usedCount + 1);
+                if (found) return;
+                ans.pop_back();
+                used[x] = false;
+            }
+        }
+    }
+}
+
+int main() {
+    ios::sync_with_stdio(false);
+    cin.tie(0);
+    if (!(cin >> s)) return 0;
+    L = (int)s.size();
+
+    // determine N: try values 1..50, find one whose total digits equals L
+    N = -1;
+    for (int cand = 1; cand <= 50; ++cand) {
+        int tot;
+        if (cand <= 9) tot = cand;
+        else tot = 2 * cand - 9;
+        if (tot == L) { N = cand; break; }
+    }
+    // If not found, no solution (but per problem input should be valid)
+    if (N == -1) {
+        // print nothing or handle
+        return 0;
+    }
+
+    for (int i = 0; i <= N; ++i) used[i] = false;
+    ans.clear();
+    found = false;
+
+    dfs(0, 0);
+
+    if (found) {
+        for (size_t i = 0; i < ans.size(); ++i) {
+            if (i) cout << ' ';
+            cout << ans[i];
+        }
+        cout << '\n';
+    }
+    return 0;
+}

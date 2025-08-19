@@ -1,0 +1,21 @@
+#include <iostream>
+using namespace std;
+
+int main() {
+    int N;
+    cin >> N;
+
+    int x5 = N / 5;
+    while (x5 >= 0) {
+        int remaining = N - x5 * 5;
+        if (remaining % 3 == 0) {
+            int x3 = remaining / 3;
+            cout << x5 + x3 << endl;
+            return 0;
+        }
+        x5--;
+    }
+
+    cout << -1 << endl;
+    return 0;
+}

@@ -1,0 +1,52 @@
+#include <iostream>
+#include <vector>
+#include <algorithm>
+using namespace std;
+
+int main() {
+    int N, M;
+    cin >> N >> M;
+
+    vector<int> W(N + 1), V(N + 1);  // W[i]: trọng lượng, V[i]: giá trị
+    for (int i = 1; i <= N; ++i) {
+        cin >> W[i] >> V[i];
+    }
+
+    vector<vector<int> > dp(N + 1, vector<int>(M + 1, 0));
+    // dp[i][j] = giá trị tối đa khi xét i món đồ đầu tiên với trọng lượng j
+
+    for (int i = 1; i <= N; ++i) {
+        for (int j = 0; j <= M; ++j) {
+            dp[i][j] = dp[i - 1][j]; // Không lấy đồ i
+            if (j >= W[i]) {
+                dp[i][j] = max(dp[i][j], dp[i - 1][j - W[i]] + V[i]); // Có thể lấy
+            }
+        }
+    }
+
+    // Truy vết
+    int res = dp[N][M];
+    if (res == 0) {
+        cout << "0" << endl;
+        return 0;
+    }
+
+    cout << res << endl;
+    vector<int> chosen;
+    int i = N, j = M;
+    while (i > 0) {
+        if (j >= W[i] && dp[i][j] == dp[i - 1][j - W[i]] + V[i]) {
+            chosen.push_back(i);
+            j -= W[i];
+        }
+        i--;
+    }
+
+    for (int k = 0; k < (int)chosen.size(); ++k) {
+        cout << chosen[k];
+        if (k < (int)chosen.size() - 1) cout << " ";
+    }
+    cout << endl;
+
+    return 0;
+}

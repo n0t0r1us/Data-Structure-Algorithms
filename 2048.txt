@@ -1,0 +1,48 @@
+#include <iostream>
+#include <vector>
+using namespace std;
+
+int main() {
+    int n;
+    cin >> n;
+    int a[10][10]; // ma trận n x n
+
+    for (int i = 0; i < n; ++i) // nhập ma trận
+        for (int j = 0; j < n; ++j)
+            cin >> a[i][j];
+
+    for (int j = 0; j < n; ++j) { // duyệt từng cột
+        vector<int> column;
+        // gom các số != 0 từ dưới lên
+        for (int i = n - 1; i >= 0; --i)
+            if (a[i][j] != 0)
+                column.push_back(a[i][j]);
+
+        // xử lý gộp các số giống nhau
+        vector<int> merged;
+        for (int i = 0; i < (int)column.size(); ++i) {
+            if (i + 1 < (int)column.size() && column[i] == column[i + 1]) {
+                merged.push_back(column[i] * 2);
+                ++i; // bỏ qua phần tử tiếp theo vì đã gộp
+            } else {
+                merged.push_back(column[i]);
+            }
+        }
+
+        // điền lại vào ma trận từ dưới lên
+        int idx = n - 1;
+        for (int k = 0; k < (int)merged.size(); ++k)
+            a[idx--][j] = merged[k];
+        while (idx >= 0) // các ô còn lại gán bằng 0
+            a[idx--][j] = 0;
+    }
+
+    // in kết quả
+    for (int i = 0; i < n; ++i) {
+        for (int j = 0; j < n; ++j)
+            cout << a[i][j] << " ";
+        cout << endl;
+    }
+
+    return 0;
+}

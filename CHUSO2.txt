@@ -1,0 +1,41 @@
+#include <bits/stdc++.h>
+using namespace std;
+
+int main() {
+    ios::sync_with_stdio(false);
+    cin.tie(0);
+
+    long long p;
+    cin >> p;
+
+    long long len = 1; // số chữ số của nhóm số hiện tại (1..9, 10..99, ...)
+    long long cnt = 9; // số lượng số trong nhóm
+    long long start = 1;
+
+    // Tìm nhóm mà chữ số thứ p nằm trong đó
+    while (p > len * cnt) {
+        p -= len * cnt;
+        len++;
+        cnt *= 10;
+        start *= 10;
+    }
+
+    // Tìm số chứa chữ số thứ p
+    long long num = start + (p - 1) / len;
+    int pos = (p - 1) % len; // vị trí trong số
+
+    string s = "";
+    {
+        long long x = num;
+        string tmp = "";
+        while (x > 0) {
+            tmp += char('0' + (x % 10));
+            x /= 10;
+        }
+        reverse(tmp.begin(), tmp.end());
+        s = tmp;
+    }
+
+    cout << s[pos] << "\n";
+    return 0;
+}

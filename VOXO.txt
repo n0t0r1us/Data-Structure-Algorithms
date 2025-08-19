@@ -1,0 +1,30 @@
+#include <iostream>
+#include <cmath>
+using namespace std;
+
+int main() {
+    int x, y;
+    cin >> x >> y;
+
+    if (x == 0 && y == 0) {
+        cout << 1 << endl;
+        return 0;
+    }
+
+    int k = max(abs(x), abs(y));
+    int maxVal = (2 * k + 1) * (2 * k + 1);
+    int res;
+
+    if (y == -k) {
+        res = maxVal - (k - x);
+    } else if (x == -k) {
+        res = maxVal - (2 * k) - (k + y);
+    } else if (y == k) {
+        res = maxVal - (4 * k) - (x + k);
+    } else if (x == k) {
+        res = maxVal - (6 * k) - (k - y);
+    }
+
+    cout << res << endl;
+    return 0;
+}

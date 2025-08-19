@@ -1,0 +1,21 @@
+#include <bits/stdc++.h>
+using namespace std;
+long long f(long long p, long long q) {
+    if (p < q) swap(p, q);
+    if (p <= q + 1) return p + q;
+    return q * 2 + 1;
+}
+int main() {
+    ios::sync_with_stdio(false);
+    cin.tie(NULL);
+    int T; cin >> T;
+    while (T--) {
+        long long a, b, c;
+        cin >> a >> b >> c;
+        long long ans = 0;
+        ans = max(ans, f(a, b));
+        ans = max(ans, f(a, c));
+        ans = max(ans, f(b, c));
+        cout << ans << "\n";
+    }
+}

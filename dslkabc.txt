@@ -1,0 +1,106 @@
+#include <iostream>
+using namespace std;
+
+struct Node {
+    int data;
+    Node* next;
+};
+
+void InitList(Node*& head) {
+    head = NULL;
+}
+
+Node* MakeNode(int x) {
+    Node* p = new Node;
+    p->data = x;
+    p->next = NULL;
+    return p;
+}
+
+void InsertLast(Node*& head, int x) {
+    Node* p = MakeNode(x);
+    if (head == NULL) {
+        head = p;
+    } else {
+        Node* temp = head;
+        while (temp->next != NULL)
+            temp = temp->next;
+        temp->next = p;
+    }
+}
+
+void PrintList(Node* head) {
+    Node* p = head;
+    while (p != NULL) {
+        cout << p->data << " ";
+        p = p->next;
+    }
+    cout << endl;
+}
+
+// a) Đếm số phần tử
+int Count(Node* head) {
+    int cnt = 0;
+    while (head != NULL) {
+        cnt++;
+        head = head->next;
+    }
+    return cnt;
+}
+
+// b) Tổng và trung bình
+void SumAndAverage(Node* head, int& sum, double& avg) {
+    sum = 0;
+    int cnt = 0;
+    Node* p = head;
+    while (p != NULL) {
+        sum += p->data;
+        cnt++;
+        p = p->next;
+    }
+    avg = (cnt == 0) ? 0 : (double)sum / cnt;
+}
+
+// c) Kiểm tra tăng dần
+bool IsAscending(Node* head) {
+    if (head == NULL || head->next == NULL) return true;
+    Node* p = head;
+    while (p->next != NULL) {
+        if (p->data > p->next->data)
+            return false;
+        p = p->next;
+    }
+    return true;
+}
+
+int main() {
+    Node* head;
+    InitList(head);
+
+    int n, x;
+    cin >> n;
+    for (int i = 0; i < n; i++) {
+        cin >> x;
+        InsertLast(head, x);
+    }
+
+    // In danh sách
+    PrintList(head);
+
+    // a) Đếm
+    cout << "So phan tu: " << Count(head) << endl;
+
+    // b) Tổng và trung bình
+    int sum; double avg;
+    SumAndAverage(head, sum, avg);
+    cout << "Tong: " << sum << endl;
+    cout << "Trung binh: " << avg << endl;
+
+    // c) Tăng dần?
+    if (IsAscending(head))
+        cout << "Tang dan" << endl;
+    else
+        cout << "Khong tang dan" << endl;
+
+    return 0;
+}
